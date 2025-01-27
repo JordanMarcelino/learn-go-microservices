@@ -21,7 +21,7 @@ type PostgresOptions struct {
 	MaxConnLifetime int
 }
 
-func InitPostgres(opt *PostgresOptions) *sqlx.DB {
+func NewPostgres(opt *PostgresOptions) *sqlx.DB {
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=Asia/Jakarta",
 		opt.Host,

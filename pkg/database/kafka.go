@@ -62,7 +62,7 @@ func NewKafkaAsyncProducer(opt *KafkaProducerOptions) *sarama.AsyncProducer {
 	return &producer
 }
 
-func NewKafkaConsumer(opt *KafkaConsumerOptions) *sarama.ConsumerGroup {
+func NewKafkaConsumerGroup(opt *KafkaConsumerOptions) *sarama.ConsumerGroup {
 	config := opt.SaramaConfig
 	if config == nil {
 		config = sarama.NewConfig()

@@ -8,7 +8,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-type RedisOptions struct {
+type RedisClusterOptions struct {
 	Addrs           []string
 	Password        string
 	DialTimeout     int
@@ -19,7 +19,7 @@ type RedisOptions struct {
 	MaxConnLifetime int
 }
 
-func InitRedisCluster(opt *RedisOptions) *redis.ClusterClient {
+func NewRedisCluster(opt *RedisClusterOptions) *redis.ClusterClient {
 	rdb := redis.NewClusterClient(&redis.ClusterOptions{
 		Addrs:           opt.Addrs,
 		Password:        opt.Password,
