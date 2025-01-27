@@ -1,0 +1,66 @@
+services:
+  postgres-1: &postgres-common
+    image: bitnami/postgresql-repmgr:latest
+    restart: always
+    container_name: postgres-1
+    environment: &postgres-env
+      POSTGRESQL_POSTGRES_PASSWORD: postgres
+      POSTGRESQL_USERNAME: admin
+      POSTGRESQL_PASSWORD: secret
+      POSTGRESQL_DATABASE: api_db
+      REPMGR_PRIMARY_HOST: postgres-1
+      REPMGR_PARTNER_NODES: postgres-2,postgres-3,postgres-1
+      REPMGR_NODE_NAME: postgres-1
+      REPMGR_NODE_NETWORK_NAME: postgres-1
+      REPMGR_USERNAME: repmgr
+      REPMGR_PASSWORD: repmgr
+    volumes:
+      - postgres-1_data:/bitnami/postgresql
+
+  postgres-2:
+    <<: *postgres-common
+    container_name: postgres-2
+    environment:
+      <<: *postgres-env
+      REPMGR_PARTNER_NODES: postgres-1,postgres-3,postgres-2
+      REPMGR_NODE_NAME: postgres-2
+      REPMGR_NODE_NETWORK_NAME: postgres-2
+    volumes:
+      - postgres-2_data:/bitnami/postgresql
+
+  postgres-3:
+    <<: *postgres-common
+    container_name: postgres-3
+    environment:
+      <<: *postgres-env
+      REPMGR_PARTNER_NODES: postgres-1,postgres-2,postgres-3
+      REPMGR_NODE_NAME: postgres-3
+      REPMGR_NODE_NETWORK_NAME: postgres-3
+    volumes:
+      - postgres-3_data:/bitnami/postgresql
+
+  pgpool:
+    image: "bitnami/pgpool:latest"
+    restart: always
+    container_name: pgpool
+    environment:
+      PGPOOL_BACKEND_NODES: 0:postgres-1:5432,1:postgres-2:5432,2:postgres-3:5432
+      PGPOOL_SR_CHECK_USER: repmgr
+      PGPOOL_SR_CHECK_PASSWORD: repmgr
+      PGPOOL_POSTGRES_USERNAME: postgres
+      PGPOOL_POSTGRES_PASSWORD: postgres
+      PGPOOL_ADMIN_USERNAME: admin
+      PGPOOL_ADMIN_PASSWORD: secret
+      PGPOOL_ENABLE_LOAD_BALANCING: yes
+    ports:
+      - "5000:5432"
+    healthcheck:
+      test: ["CMD", "/opt/bitnami/scripts/pgpool/healthcheck.sh"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  postgres-1_data:
+  postgres-2_data:
+  postgres-3_data:
