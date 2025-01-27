@@ -1,0 +1,47 @@
+services:
+  redis-1: &redis-common
+    image: "bitnami/redis-cluster:latest"
+    restart: always
+    container_name: redis-1
+    environment: &redis-env
+      REDIS_PASSWORD: a45e0a886d9b88f9ede74def
+      REDIS_NODES: redis-1 redis-2 redis-3 redis-cluster
+    volumes:
+      - redis-1_data:/bitnami/redis/data
+
+  redis-2:
+    <<: *redis-common
+    container_name: redis-2
+    environment:
+      <<: *redis-env
+    volumes:
+      - redis-2_data:/bitnami/redis/data
+
+  redis-3:
+    <<: *redis-common
+    container_name: redis-3
+    environment:
+      <<: *redis-env
+    volumes:
+      - redis-3_data:/bitnami/redis/data
+
+  redis-cluster:
+    <<: *redis-common
+    container_name: redis-cluster
+    environment:
+      <<: *redis-env
+      REDISCLI_AUTH: a45e0a886d9b88f9ede74def
+      REDIS_CLUSTER_REPLICAS: 1
+      REDIS_CLUSTER_CREATOR: "yes"
+    volumes:
+      - redis-cluster:/bitnami/redis/data
+    depends_on:
+      - redis-1
+      - redis-2
+      - redis-3
+
+volumes:
+  redis-1_data:
+  redis-2_data:
+  redis-3_data:
+  redis-cluster:

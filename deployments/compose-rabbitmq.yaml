@@ -1,0 +1,81 @@
+services:
+  rabbitmq-1: &rabbitmq-common
+    image: "rabbitmq:4-management-alpine"
+    restart: always
+    hostname: rabbitmq-1
+    container_name: rabbitmq-1
+    environment: &rabbitmq-env
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: 74faa001f5ba434d
+      RABBITMQ_DEFAULT_VHOST: /
+      RABBITMQ_ERLANG_COOKIE: 40556c104edf7359de6a595c
+    volumes:
+      - rabbitmq-1_data:/var/lib/rabbitmq/mnesia
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  rabbitmq-2:
+    <<: *rabbitmq-common
+    hostname: rabbitmq-2
+    container_name: rabbitmq-2
+    environment:
+      <<: *rabbitmq-env
+    volumes:
+      - rabbitmq-2_data:/var/lib/rabbitmq/mnesia
+    command: >
+      bash -c "
+      rabbitmq-server -detached &&
+      sleep 10 &&
+      rabbitmqctl stop_app &&
+      rabbitmqctl join_cluster rabbit@rabbitmq-1 &&
+      rabbitmqctl start_app &&
+      rabbitmqctl stop &&
+      exec rabbitmq-server"
+    depends_on:
+      rabbitmq-1:
+        condition: service_healthy
+
+  rabbitmq-3:
+    <<: *rabbitmq-common
+    hostname: rabbitmq-3
+    container_name: rabbitmq-3
+    environment:
+      <<: *rabbitmq-env
+    volumes:
+      - rabbitmq-3_data:/var/lib/rabbitmq/mnesia
+    command: >
+      bash -c "
+      rabbitmq-server -detached &&
+      sleep 10 &&
+      rabbitmqctl stop_app &&
+      rabbitmqctl join_cluster rabbit@rabbitmq-1 &&
+      rabbitmqctl start_app &&
+      rabbitmqctl stop &&
+      exec rabbitmq-server"
+    depends_on:
+      rabbitmq-1:
+        condition: service_healthy
+
+  haproxy-rabbitmq:
+    image: "haproxy:latest"
+    container_name: haproxy-rabbitmq
+    ports:
+      - "1936:1936"
+      - "15872:15672"
+    volumes:
+      - ./../infra/rabbitmq-ha/haproxy-rabbitmq.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    depends_on:
+      rabbitmq-1:
+        condition: service_healthy
+      rabbitmq-2:
+        condition: service_healthy
+      rabbitmq-3:
+        condition: service_healthy
+
+volumes:
+  rabbitmq-1_data:
+  rabbitmq-2_data:
+  rabbitmq-3_data:
