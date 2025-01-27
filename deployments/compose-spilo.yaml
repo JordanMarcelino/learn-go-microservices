@@ -1,0 +1,106 @@
+services:
+  etcd-1: &etcd-common
+    image: "bitnami/etcd:latest"
+    restart: always
+    container_name: etcd-1
+    environment: &etcd-env
+      ETCD_NAME: etcd-1
+      ETCD_ROOT_PASSWORD: e58b9e0316b42e99df858634
+      ETCD_INITIAL_CLUSTER: etcd-1=http://etcd-1:2380,etcd-2=http://etcd-2:2380,etcd-3=http://etcd-3:2380
+      ETCD_INITIAL_CLUSTER_TOKEN: 3bf611c3e25a9fe24f860fd0
+      ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379
+      ETCD_ADVERTISE_CLIENT_URLS: http://etcd-1:2379
+      ETCD_LISTEN_PEER_URLS: http://0.0.0.0:2380
+      ETCD_INITIAL_ADVERTISE_PEER_URLS: http://etcd-1:2380
+      ETCD_ENABLE_V2: true
+    volumes:
+      - etcd-1_data:/bitnami/etcd
+
+  etcd-2:
+    <<: *etcd-common
+    container_name: etcd-2
+    environment:
+      <<: *etcd-env
+      ETCD_NAME: etcd-2
+      ETCD_ADVERTISE_CLIENT_URLS: http://etcd-2:2379
+      ETCD_INITIAL_ADVERTISE_PEER_URLS: http://etcd-2:2380
+    volumes:
+      - etcd-2_data:/bitnami/etcd
+
+  etcd-3:
+    <<: *etcd-common
+    container_name: etcd-3
+    environment:
+      <<: *etcd-env
+      ETCD_NAME: etcd-3
+      ETCD_ADVERTISE_CLIENT_URLS: http://etcd-3:2379
+      ETCD_INITIAL_ADVERTISE_PEER_URLS: http://etcd-3:2380
+    volumes:
+      - etcd-3_data:/bitnami/etcd
+
+  postgres-1: &postgres-common
+    image: "ghcr.io/zalando/spilo-16:3.3-p3"
+    restart: always
+    container_name: postgres-1
+    environment: &postgres-env
+      SCOPE: pg-cluster
+      ETCD_HOSTS: "etcd-1:2379,etcd-2:2379,etcd-3:2379"
+      PATRONI_ETCD_USERNAME: "root"
+      PATRONI_ETCD_PASSWORD: "e58b9e0316b42e99df858634"
+      PGUSER_ADMIN: admin
+      PGPASSWORD_ADMIN: secret
+      PGUSER_SUPERUSER: postgres
+      PGPASSWORD_SUPERUSER: postgres
+      PGUSER_STANDBY: replicator
+      PGPASSWORD_STANDBY: replicator
+    volumes:
+      - postgres-1_data:/home/postgres/pgroot
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8008/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    depends_on:
+      - etcd-1
+      - etcd-2
+      - etcd-3
+
+  postgres-2:
+    <<: *postgres-common
+    container_name: postgres-2
+    environment:
+      <<: *postgres-env
+    volumes:
+      - postgres-2_data:/home/postgres/pgroot
+
+  postgres-3:
+    <<: *postgres-common
+    container_name: postgres-3
+    environment:
+      <<: *postgres-env
+    volumes:
+      - postgres-3_data:/home/postgres/pgroot
+
+  haproxy-postgres:
+    image: "haproxy:latest"
+    restart: always
+    container_name: haproxy-postgres
+    volumes:
+      - ./../infra/postgres-ha/haproxy-postgresql.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    ports:
+      - "7000:7000"
+    depends_on:
+      postgres-master:
+        condition: service_healthy
+      postgres-slave-1:
+        condition: service_healthy
+      postgres-slave-2:
+        condition: service_healthy
+
+volumes:
+  etcd-1_data:
+  etcd-2_data:
+  etcd-3_data:
+  postgres-1_data:
+  postgres-2_data:
+  postgres-3_data:
