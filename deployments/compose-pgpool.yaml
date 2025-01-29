@@ -1,50 +1,50 @@
 services:
-  postgres-1: &postgres-common
-    image: bitnami/postgresql-repmgr:latest
+  pg-auth-1: &pg-auth-common
+    image: "bitnami/postgresql-repmgr:latest"
     restart: always
-    container_name: postgres-1
-    environment: &postgres-env
+    container_name: pg-auth-1
+    environment: &pg-auth-env
       POSTGRESQL_POSTGRES_PASSWORD: postgres
       POSTGRESQL_USERNAME: admin
       POSTGRESQL_PASSWORD: secret
       POSTGRESQL_DATABASE: api_db
-      REPMGR_PRIMARY_HOST: postgres-1
-      REPMGR_PARTNER_NODES: postgres-2,postgres-3,postgres-1
-      REPMGR_NODE_NAME: postgres-1
-      REPMGR_NODE_NETWORK_NAME: postgres-1
+      REPMGR_PRIMARY_HOST: pg-auth-1
+      REPMGR_PARTNER_NODES: pg-auth-2,pg-auth-3,pg-auth-1
+      REPMGR_NODE_NAME: pg-auth-1
+      REPMGR_NODE_NETWORK_NAME: pg-auth-1
       REPMGR_USERNAME: repmgr
       REPMGR_PASSWORD: repmgr
     volumes:
-      - postgres-1_data:/bitnami/postgresql
+      - pg-auth-1_data:/bitnami/postgresql
 
-  postgres-2:
-    <<: *postgres-common
-    container_name: postgres-2
+  pg-auth-2:
+    <<: *pg-auth-common
+    container_name: pg-auth-2
     environment:
-      <<: *postgres-env
-      REPMGR_PARTNER_NODES: postgres-1,postgres-3,postgres-2
-      REPMGR_NODE_NAME: postgres-2
-      REPMGR_NODE_NETWORK_NAME: postgres-2
+      <<: *pg-auth-env
+      REPMGR_PARTNER_NODES: pg-auth-1,pg-auth-3,pg-auth-2
+      REPMGR_NODE_NAME: pg-auth-2
+      REPMGR_NODE_NETWORK_NAME: pg-auth-2
     volumes:
-      - postgres-2_data:/bitnami/postgresql
+      - pg-auth-2_data:/bitnami/postgresql
 
-  postgres-3:
-    <<: *postgres-common
-    container_name: postgres-3
+  pg-auth-3:
+    <<: *pg-auth-common
+    container_name: pg-auth-3
     environment:
-      <<: *postgres-env
-      REPMGR_PARTNER_NODES: postgres-1,postgres-2,postgres-3
-      REPMGR_NODE_NAME: postgres-3
-      REPMGR_NODE_NETWORK_NAME: postgres-3
+      <<: *pg-auth-env
+      REPMGR_PARTNER_NODES: pg-auth-1,pg-auth-2,pg-auth-3
+      REPMGR_NODE_NAME: pg-auth-3
+      REPMGR_NODE_NETWORK_NAME: pg-auth-3
     volumes:
-      - postgres-3_data:/bitnami/postgresql
+      - pg-auth-3_data:/bitnami/postgresql
 
-  pgpool:
+  pgpool-auth:
     image: "bitnami/pgpool:latest"
     restart: always
-    container_name: pgpool
+    container_name: pgpool-auth
     environment:
-      PGPOOL_BACKEND_NODES: 0:postgres-1:5432,1:postgres-2:5432,2:postgres-3:5432
+      PGPOOL_BACKEND_NODES: 0:pg-auth-1:5432,1:pg-auth-2:5432,2:pg-auth-3:5432
       PGPOOL_SR_CHECK_USER: repmgr
       PGPOOL_SR_CHECK_PASSWORD: repmgr
       PGPOOL_POSTGRES_USERNAME: postgres
@@ -60,7 +60,135 @@ services:
       timeout: 3s
       retries: 10
 
+  pg-product-1: &pg-product-common
+    image: "bitnami/postgresql-repmgr:latest"
+    restart: always
+    container_name: pg-product-1
+    environment: &pg-product-env
+      POSTGRESQL_POSTGRES_PASSWORD: postgres
+      POSTGRESQL_USERNAME: admin
+      POSTGRESQL_PASSWORD: secret
+      POSTGRESQL_DATABASE: api_db
+      REPMGR_PRIMARY_HOST: pg-product-1
+      REPMGR_PARTNER_NODES: pg-product-2,pg-product-3,pg-product-1
+      REPMGR_NODE_NAME: pg-product-1
+      REPMGR_NODE_NETWORK_NAME: pg-product-1
+      REPMGR_USERNAME: repmgr
+      REPMGR_PASSWORD: repmgr
+    volumes:
+      - pg-product-1_data:/bitnami/postgresql
+
+  pg-product-2:
+    <<: *pg-product-common
+    container_name: pg-product-2
+    environment:
+      <<: *pg-product-env
+      REPMGR_PARTNER_NODES: pg-product-1,pg-product-3,pg-product-2
+      REPMGR_NODE_NAME: pg-product-2
+      REPMGR_NODE_NETWORK_NAME: pg-product-2
+    volumes:
+      - pg-product-2_data:/bitnami/postgresql
+
+  pg-product-3:
+    <<: *pg-product-common
+    container_name: pg-product-3
+    environment:
+      <<: *pg-product-env
+      REPMGR_PARTNER_NODES: pg-product-1,pg-product-2,pg-product-3
+      REPMGR_NODE_NAME: pg-product-3
+      REPMGR_NODE_NETWORK_NAME: pg-product-3
+    volumes:
+      - pg-product-3_data:/bitnami/postgresql
+
+  pgpool-product:
+    image: "bitnami/pgpool:latest"
+    restart: always
+    container_name: pgpool-product
+    environment:
+      PGPOOL_BACKEND_NODES: 0:pg-product-1:5432,1:pg-product-2:5432,2:pg-product-3:5432
+      PGPOOL_SR_CHECK_USER: repmgr
+      PGPOOL_SR_CHECK_PASSWORD: repmgr
+      PGPOOL_POSTGRES_USERNAME: postgres
+      PGPOOL_POSTGRES_PASSWORD: postgres
+      PGPOOL_ADMIN_USERNAME: admin
+      PGPOOL_ADMIN_PASSWORD: secret
+      PGPOOL_ENABLE_LOAD_BALANCING: yes
+    ports:
+      - "5001:5432"
+    healthcheck:
+      test: ["CMD", "/opt/bitnami/scripts/pgpool/healthcheck.sh"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  pg-order-1: &pg-order-common
+    image: "bitnami/postgresql-repmgr:latest"
+    restart: always
+    container_name: pg-order-1
+    environment: &pg-order-env
+      POSTGRESQL_POSTGRES_PASSWORD: postgres
+      POSTGRESQL_USERNAME: admin
+      POSTGRESQL_PASSWORD: secret
+      POSTGRESQL_DATABASE: api_db
+      REPMGR_PRIMARY_HOST: pg-order-1
+      REPMGR_PARTNER_NODES: pg-order-2,pg-order-3,pg-order-1
+      REPMGR_NODE_NAME: pg-order-1
+      REPMGR_NODE_NETWORK_NAME: pg-order-1
+      REPMGR_USERNAME: repmgr
+      REPMGR_PASSWORD: repmgr
+    volumes:
+      - pg-order-1_data:/bitnami/postgresql
+
+  pg-order-2:
+    <<: *pg-order-common
+    container_name: pg-order-2
+    environment:
+      <<: *pg-order-env
+      REPMGR_PARTNER_NODES: pg-order-1,pg-order-3,pg-order-2
+      REPMGR_NODE_NAME: pg-order-2
+      REPMGR_NODE_NETWORK_NAME: pg-order-2
+    volumes:
+      - pg-order-2_data:/bitnami/postgresql
+
+  pg-order-3:
+    <<: *pg-order-common
+    container_name: pg-order-3
+    environment:
+      <<: *pg-order-env
+      REPMGR_PARTNER_NODES: pg-order-1,pg-order-2,pg-order-3
+      REPMGR_NODE_NAME: pg-order-3
+      REPMGR_NODE_NETWORK_NAME: pg-order-3
+    volumes:
+      - pg-order-3_data:/bitnami/postgresql
+
+  pgpool-order:
+    image: "bitnami/pgpool:latest"
+    restart: always
+    container_name: pgpool-order
+    environment:
+      PGPOOL_BACKEND_NODES: 0:pg-order-1:5432,1:pg-order-2:5432,2:pg-order-3:5432
+      PGPOOL_SR_CHECK_USER: repmgr
+      PGPOOL_SR_CHECK_PASSWORD: repmgr
+      PGPOOL_POSTGRES_USERNAME: postgres
+      PGPOOL_POSTGRES_PASSWORD: postgres
+      PGPOOL_ADMIN_USERNAME: admin
+      PGPOOL_ADMIN_PASSWORD: secret
+      PGPOOL_ENABLE_LOAD_BALANCING: yes
+    ports:
+      - "5002:5432"
+    healthcheck:
+      test: ["CMD", "/opt/bitnami/scripts/pgpool/healthcheck.sh"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
 volumes:
-  postgres-1_data:
-  postgres-2_data:
-  postgres-3_data:
+  pg-auth-1_data:
+  pg-auth-2_data:
+  pg-auth-3_data:
+  pg-product-1_data:
+  pg-product-2_data:
+  pg-product-3_data:
+  pg-order-1_data:
+  pg-order-2_data:
+  pg-order-3_data:
