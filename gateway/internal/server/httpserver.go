@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/jordanmarcelino/learn-go-microservices/gateway/internal/config"
 	"github.com/jordanmarcelino/learn-go-microservices/gateway/internal/log"
@@ -61,6 +62,7 @@ func (s *HttpServer) Shutdown() {
 func RegisterMiddleware(router *gin.Engine, cfg *config.Config) {
 	middlewares := []gin.HandlerFunc{
 		gin.Recovery(),
+		gzip.Gzip(gzip.BestSpeed),
 		middleware.Logger(log.Logger),
 		middleware.ErrorHandler(),
 		middleware.RequestTimeout(cfg.HttpServer.RequestTimeoutPeriod),
