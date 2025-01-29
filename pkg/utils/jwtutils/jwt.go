@@ -2,7 +2,6 @@ package jwtutils
 
 import (
 	"errors"
-	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -25,7 +24,6 @@ type jwtUtil struct {
 }
 
 func NewJwtUtil() JwtUtil {
-	log.Println(*config.JWT_CONFIG)
 	return &jwtUtil{
 		config: config.JWT_CONFIG,
 	}
