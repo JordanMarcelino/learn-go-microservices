@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS users CASCADE;
+DROP INDEX IF EXISTS idx_user_email;
