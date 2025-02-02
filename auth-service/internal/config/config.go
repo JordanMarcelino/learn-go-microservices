@@ -12,6 +12,7 @@ type Config struct {
 	App        *AppConfig
 	HttpServer *HttpServerConfig
 	Postgres   *PostgresConfig
+	Redis      *RedisConfig
 	Amqp       *AMQPConfig
 	Logger     *LoggerConfig
 }
@@ -30,6 +31,7 @@ func InitConfig() *Config {
 		App:        initAppConfig(),
 		HttpServer: initHttpServerConfig(),
 		Postgres:   initPostgresConfig(),
+		Redis:      initRedisConfig(),
 		Amqp:       initAmqpConfig(),
 		Logger:     initLoggerConfig(),
 	}
