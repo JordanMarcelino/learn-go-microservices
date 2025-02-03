@@ -21,6 +21,7 @@ func (c *UserController) Route(r *gin.Engine) {
 	r.POST("/login", c.Login)
 	r.POST("/register", c.Register)
 	r.POST("/verify", c.Verify)
+	r.POST("/resend-verification", c.ResendVerification)
 }
 
 func (c *UserController) Login(ctx *gin.Context) {
@@ -68,4 +69,20 @@ func (c *UserController) Verify(ctx *gin.Context) {
 	}
 
 	ginutils.ResponseOK(ctx, res)
+}
+
+func (c *UserController) ResendVerification(ctx *gin.Context) {
+	req := new(dto.ResendVerificationRequest)
+	if err := ctx.ShouldBindJSON(req); err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	err := c.userUseCase.ResendVerification(ctx, req)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ginutils.ResponseOKPlain(ctx)
 }
