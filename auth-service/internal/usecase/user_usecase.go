@@ -12,28 +12,70 @@ import (
 	"github.com/jordanmarcelino/learn-go-microservices/auth-service/internal/utils/tokenutils"
 	"github.com/jordanmarcelino/learn-go-microservices/pkg/mq"
 	"github.com/jordanmarcelino/learn-go-microservices/pkg/utils/encryptutils"
+	"github.com/jordanmarcelino/learn-go-microservices/pkg/utils/jwtutils"
 )
 
 type UserUseCase interface {
+	Login(ctx context.Context, req *dto.LoginRequest) (*dto.LoginResponse, error)
 	Register(ctx context.Context, req *dto.RegisterRequest) (*dto.RegisterResponse, error)
 }
 
 type userUseCaseImpl struct {
 	Hasher                   encryptutils.Hasher
+	JwtUtil                  jwtutils.JwtUtil
 	DataStore                repository.DataStore
 	SendVerificationProducer mq.AMQPProducer
 }
 
 func NewUserUseCase(
 	hasher encryptutils.Hasher,
+	JwtUtil jwtutils.JwtUtil,
 	dataStore repository.DataStore,
 	sendVerificationProducer mq.AMQPProducer,
 ) UserUseCase {
 	return &userUseCaseImpl{
 		Hasher:                   hasher,
+		JwtUtil:                  JwtUtil,
 		DataStore:                dataStore,
 		SendVerificationProducer: sendVerificationProducer,
 	}
+}
+
+func (u *userUseCaseImpl) Login(ctx context.Context, req *dto.LoginRequest) (*dto.LoginResponse, error) {
+	res := new(dto.LoginResponse)
+	err := u.DataStore.Atomic(ctx, func(ds repository.DataStore) error {
+		userRepository := ds.UserRepository()
+
+		user, err := userRepository.FindByEmail(ctx, req.Email)
+		if err != nil {
+			return err
+		}
+
+		if user == nil {
+			return httperror.NewInvalidCredentialError()
+		}
+
+		if ok := u.Hasher.Check(req.Password, user.HashPassword); !ok {
+			return httperror.NewInvalidCredentialError()
+		}
+		if !user.IsVerified {
+			return httperror.NewUserNotVerifiedError()
+		}
+
+		token, err := u.JwtUtil.Sign(user.ID)
+		if err != nil {
+			return err
+		}
+
+		res.AccessToken = token
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
 
 func (u *userUseCaseImpl) Register(ctx context.Context, req *dto.RegisterRequest) (*dto.RegisterResponse, error) {
