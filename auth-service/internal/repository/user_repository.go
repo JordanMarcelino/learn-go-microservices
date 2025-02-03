@@ -48,11 +48,11 @@ func (r *userRepositoryImpl) FindByEmail(ctx context.Context, email string) (*en
 func (r *userRepositoryImpl) Save(ctx context.Context, user *entity.User) error {
 	query := `
 	INSERT INTO
-	users(email, hash_password)
+		users(email, hash_password)
 	VALUES
-	($1, $2)
+		($1, $2)
 	RETURNING
-	id, created_at, updated_at
+		id, created_at, updated_at
 	`
 
 	return r.DB.QueryRowContext(ctx, query, user.Email, user.HashPassword).Scan(&user.ID, &user.CreatedAt, &user.UpdatedAt)

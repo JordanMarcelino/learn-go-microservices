@@ -26,6 +26,7 @@ type userUseCaseImpl struct {
 	JwtUtil                  jwtutils.JwtUtil
 	DataStore                repository.DataStore
 	SendVerificationProducer mq.AMQPProducer
+	AccountVerifiedProducer  mq.AMQPProducer
 }
 
 func NewUserUseCase(
@@ -33,12 +34,14 @@ func NewUserUseCase(
 	JwtUtil jwtutils.JwtUtil,
 	dataStore repository.DataStore,
 	sendVerificationProducer mq.AMQPProducer,
+	AccountVerifiedProducer mq.AMQPProducer,
 ) UserUseCase {
 	return &userUseCaseImpl{
 		Hasher:                   hasher,
 		JwtUtil:                  JwtUtil,
 		DataStore:                dataStore,
 		SendVerificationProducer: sendVerificationProducer,
+		AccountVerifiedProducer:  AccountVerifiedProducer,
 	}
 }
 
@@ -157,6 +160,9 @@ func (u *userUseCaseImpl) Verify(ctx context.Context, req *dto.VerificationReque
 			return err
 		}
 		if err := verificationRepository.DeleteByUserID(ctx, verification.UserID); err != nil {
+			return err
+		}
+		if err := u.AccountVerifiedProducer.Send(ctx, dto.AccountVerifiedEvent{Email: user.Email}); err != nil {
 			return err
 		}
 
