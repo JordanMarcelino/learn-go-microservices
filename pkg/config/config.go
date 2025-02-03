@@ -8,7 +8,10 @@ import (
 	"github.com/spf13/viper"
 )
 
-var JWT_CONFIG *JwtConfig
+var (
+	JWT_CONFIG  *JwtConfig
+	SMTP_CONFIG *SMTPConfig
+)
 
 func init() {
 	configPath := parseConfigPath()
@@ -21,6 +24,7 @@ func init() {
 	}
 
 	JWT_CONFIG = initJwtConfig()
+	SMTP_CONFIG = initSMTPConfig()
 }
 
 func parseConfigPath() string {

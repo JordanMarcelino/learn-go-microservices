@@ -8,4 +8,5 @@ const (
 	UserNotFoundErrorErrorMessage   = "user not found"
 	TokenWrongErrorErrorMessage     = "token is wrong"
 	UserAlreadyVerifiedErrorMessage = "user already verified"
+	TokenAlreadyExistErrorMessage   = "token was recently sent, please wait before requesting another"
 )
