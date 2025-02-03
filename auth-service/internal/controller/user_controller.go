@@ -55,5 +55,17 @@ func (c *UserController) Register(ctx *gin.Context) {
 }
 
 func (c *UserController) Verify(ctx *gin.Context) {
+	req := new(dto.VerificationRequest)
+	if err := ctx.ShouldBindJSON(req); err != nil {
+		ctx.Error(err)
+		return
+	}
 
+	res, err := c.userUseCase.Verify(ctx, req)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ginutils.ResponseOK(ctx, res)
 }
