@@ -24,7 +24,18 @@ func (c *UserController) Route(r *gin.Engine) {
 }
 
 func (c *UserController) Login(ctx *gin.Context) {
+	req := new(dto.LoginRequest)
+	if err := ctx.ShouldBindJSON(req); err != nil {
+		ctx.Error(err)
+		return
+	}
 
+	res, err := c.userUseCase.Login(ctx, req)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+	ginutils.ResponseOK(ctx, res)
 }
 
 func (c *UserController) Register(ctx *gin.Context) {

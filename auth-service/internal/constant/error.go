@@ -1,5 +1,7 @@
 package constant
 
 const (
-	UserAlreadyExistErrorMessage = "user already exist"
+	UserAlreadyExistErrorMessage  = "user already exist"
+	InvalidCredentialErrorMessage = "email or password is incorrect"
+	UserNotVerifiedErrorMessage   = "user not verified"
 )
