@@ -18,6 +18,7 @@ import (
 type UserUseCase interface {
 	Login(ctx context.Context, req *dto.LoginRequest) (*dto.LoginResponse, error)
 	Register(ctx context.Context, req *dto.RegisterRequest) (*dto.RegisterResponse, error)
+	Verify(ctx context.Context, req *dto.VerificationRequest) (*dto.VerificationResponse, error)
 }
 
 type userUseCaseImpl struct {
@@ -112,6 +113,54 @@ func (u *userUseCaseImpl) Register(ctx context.Context, req *dto.RegisterRequest
 		}
 
 		res = dto.ToRegisterResponse(user)
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (u *userUseCaseImpl) Verify(ctx context.Context, req *dto.VerificationRequest) (*dto.VerificationResponse, error) {
+	res := new(dto.VerificationResponse)
+	err := u.DataStore.Atomic(ctx, func(ds repository.DataStore) error {
+		userRepository := ds.UserRepository()
+		verificationRepository := ds.VerificationRepository()
+
+		user, err := userRepository.FindByEmail(ctx, req.Email)
+		if user == nil {
+			return httperror.NewUserNotFoundError()
+		}
+		if err != nil {
+			return err
+		}
+		if user.IsVerified {
+			return httperror.NewUserAlreadyVerifiedError()
+		}
+
+		verification, err := verificationRepository.FindByUserID(ctx, user.ID)
+		if err != nil {
+			return err
+		}
+
+		if verification.ExpireAt.Before(time.Now()) {
+			return httperror.NewTokenExpiredError()
+		}
+		if verification.Token != req.VerificationToken {
+			return httperror.NewTokenWrongError()
+		}
+
+		user.IsVerified = true
+		if err := userRepository.VerifyByUserID(ctx, user.ID); err != nil {
+			return err
+		}
+		if err := verificationRepository.DeleteByUserID(ctx, verification.UserID); err != nil {
+			return err
+		}
+
+		res = dto.ToVerificationResponse(user)
 		return nil
 	})
 

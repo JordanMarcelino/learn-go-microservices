@@ -52,3 +52,11 @@ func ToRegisterResponse(user *entity.User) *RegisterResponse {
 		UpdatedAt:  user.UpdatedAt,
 	}
 }
+
+func ToVerificationResponse(user *entity.User) *VerificationResponse {
+	return &VerificationResponse{
+		ID:         user.ID,
+		Email:      user.Email,
+		IsVerified: user.IsVerified,
+	}
+}
