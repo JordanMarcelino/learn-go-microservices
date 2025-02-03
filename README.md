@@ -98,28 +98,121 @@ graph TD
 **Responsibilities**: Order processing and fulfillment
 
 ```mermaid
+graph TD
+  A[Order Created] --> B[Schedule Reminders]
+  A --> C[Start 24h Countdown]
+  B --> D[4h Reminder]
+  B --> E[12h Reminder]
+  B --> F[22h Reminder]
+  C --> G[Expiration Check]
+
+  D --> H[Send Email via Mail Service]
+  E --> H
+  F --> H
+  G --> I{Payment Status?}
+
+  I -->|Paid| J[Mark Order Completed]
+  I -->|Unpaid| K[Cancel Order]
+  K --> L[Restock Inventory]
+  K --> M[Send Cancellation Email]
+```
+
+### 1. Order Creation with Delayed Messages
+
+```mermaid
 sequenceDiagram
   participant Client
   participant Gateway
   participant OrderService
-  participant Redis
+  participant PostgreSQL
+  participant RabbitMQ
   participant Kafka
 
   Client->>Gateway: POST /orders
   Gateway->>OrderService: Forward request
-  OrderService->>Redis: Acquire lock (request ID)
+  OrderService->>Redis: SETNX lock:request_id
   Redis-->>OrderService: Lock acquired
-  OrderService->>Kafka: Publish order-created
-  Kafka->>ProductService: Update inventory
-  OrderService->>PostgreSQL: Commit order
-  OrderService->>Redis: Release lock
+  OrderService->>PostgreSQL: Create order (status=PENDING)
+  OrderService->>RabbitMQ: Publish delayed messages
+  Note over RabbitMQ: 4h, 12h, 22h delays
+  OrderService->>Kafka: order.created
+  OrderService->>Redis: DEL lock:request_id
+  Kafka->>ProductService: Reserve stock
 ```
+
+### 2. Payment Reminder Execution Flow
+
+```mermaid
+sequenceDiagram
+  participant RabbitMQ
+  participant OrderService
+  participant PostgreSQL
+  participant MailService
+
+  RabbitMQ->>OrderService: Reminder event
+  OrderService->>PostgreSQL: Get order status
+  alt Status = PENDING
+    OrderService->>MailService: Send payment reminder
+    MailService->>User: Email reminder
+  else Status = PAID/CANCELLED
+    OrderService->>RabbitMQ: Acknowledge message
+  end
+```
+
+### 3. Order Expiration Handling
+
+```mermaid
+sequenceDiagram
+  participant RabbitMQ
+  participant OrderService
+  participant PostgreSQL
+  participant Kafka
+  participant ProductService
+
+  RabbitMQ->>OrderService: Expiration event (24h)
+  OrderService->>PostgreSQL: Check payment status
+  alt Unpaid
+    OrderService->>PostgreSQL: Update status=CANCELLED
+    OrderService->>Kafka: order.cancelled
+    Kafka->>ProductService: Restock items
+    OrderService->>MailService: Notify cancellation
+  else Paid
+    OrderService->>PostgreSQL: Update status=COMPLETED
+  end
+```
+
+## 🧠 Key Design Decisions
+
+1. **Delayed Message Implementation**
+
+    ```mermaid
+    graph LR
+      A[Order Service] -->|Publish with delay| B[RabbitMQ]
+      B -->|x-delayed-message plugin| C[Delayed Exchange]
+      C -->|TTL 4h| D[Reminder Queue]
+      C -->|TTL 12h| E[Reminder Queue]
+      C -->|TTL 22h| F[Reminder Queue]
+      C -->|TTL 24h| G[Expiration Queue]
+    ```
+
+2. **State Transition Diagram**
+
+    ```mermaid
+    stateDiagram-v2
+      [*] --> PENDING
+      PENDING --> PAID: Payment received
+      PENDING --> CANCELLED: 24h timeout
+      PAID --> COMPLETED: Order fulfilled
+      CANCELLED --> [*]
+      COMPLETED --> [*]
+    ```
 
 **Key Features**:
 
 -   Redis distributed locking for idempotency
 -   Event-driven order processing
--   Circuit breaker pattern for inventory checks
+-   Delayed message handling with RabbitMQ
+-   State transition management with PostgreSQL
 
 ---
 
@@ -194,27 +287,6 @@ graph TD
   H --> I
 ```
 
-## 📈 Deployment Architecture
-
-```mermaid
-graph TD
-  A[Load Balancer] --> B[API Gateway Cluster]
-  B --> C[Auth Service Cluster]
-  B --> D[Product Service Cluster]
-  B --> E[Order Service Cluster]
-  B --> F[Mail Service Cluster]
-
-  C --> G[PostgreSQL Cluster]
-  D --> H[PostgreSQL Cluster]
-  E --> I[PostgreSQL Cluster]
-  E --> J[Redis Cluster]
-
-  C --> K[RabbitMQ Cluster]
-  D --> L[Kafka Cluster]
-  E --> L
-  F --> K
-```
-
 **Monitoring Features**:
 
 -   Real-time service metrics
@@ -252,3 +324,24 @@ graph TD
 -   Loki
 -   Tempo
 -   OpenTelemetry
+
+## 📈 Deployment Architecture
+
+```mermaid
+graph TD
+  A[Load Balancer] --> B[API Gateway Cluster]
+  B --> C[Auth Service Cluster]
+  B --> D[Product Service Cluster]
+  B --> E[Order Service Cluster]
+  B --> F[Mail Service Cluster]
+
+  C --> G[PostgreSQL Cluster]
+  D --> H[PostgreSQL Cluster]
+  E --> I[PostgreSQL Cluster]
+  E --> J[Redis Cluster]
+
+  C --> K[RabbitMQ Cluster]
+  D --> L[Kafka Cluster]
+  E --> L
+  F --> K
+```
