@@ -15,7 +15,7 @@ type AmqpOptions struct {
 	Port     int
 }
 
-func NewAmqp(opt *AmqpOptions) *amqp.Connection {
+func NewAMQP(opt *AmqpOptions) *amqp.Connection {
 	url := fmt.Sprintf("amqp://%s:%s@%s:%d/%s",
 		opt.Username,
 		opt.Password,
