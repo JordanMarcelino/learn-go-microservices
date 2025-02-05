@@ -8,5 +8,6 @@ import (
 func BootstrapAMQP() []pmq.AMQPConsumer {
 	return []pmq.AMQPConsumer{
 		mq.NewSendVerificationConsumer(rabbitmq, mailer),
+		mq.NewAccountVerifiedConsumer(rabbitmq, mailer),
 	}
 }
