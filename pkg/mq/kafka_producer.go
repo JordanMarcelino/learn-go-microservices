@@ -1,6 +1,12 @@
 package mq
 
-import "context"
+import (
+	"context"
+)
+
+type KafkaMetadata struct {
+	Retry int `json:"retry"`
+}
 
 type KafkaProducer interface {
 	Send(ctx context.Context, event KafkaEvent) error
