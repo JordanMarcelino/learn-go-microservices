@@ -7,6 +7,10 @@ import (
 	"github.com/IBM/sarama"
 )
 
+type KafkaAdminOptions struct {
+	Brokers []string
+}
+
 type KafkaProducerOptions struct {
 	SaramaConfig   *sarama.Config
 	Brokers        []string
@@ -24,7 +28,45 @@ type KafkaConsumerOptions struct {
 	InitialOffset int64
 }
 
-func NewKafkaSyncProducer(opt *KafkaProducerOptions) *sarama.SyncProducer {
+type KafkaAdmin struct {
+	Client sarama.Client
+}
+
+func NewKafkaAdmin(opt *KafkaAdminOptions) *KafkaAdmin {
+	client, err := sarama.NewClient(opt.Brokers, sarama.NewConfig())
+	if err != nil {
+		log.Fatalf("failed to create kafka admin: %v", err)
+	}
+
+	return &KafkaAdmin{
+		Client: client,
+	}
+}
+
+func (admin *KafkaAdmin) CreateTopic(topic string, numPartitions int, replicationFactor int) {
+	adminClient, err := sarama.NewClusterAdminFromClient(admin.Client)
+	if err != nil {
+		log.Fatalf("failed to create kafka admin: %v", err)
+	}
+	defer adminClient.Close()
+
+	topics, err := adminClient.ListTopics()
+	if err != nil {
+		log.Fatalf("failed to list topics: %v", err)
+	}
+
+	if _, exists := topics[topic]; !exists {
+		topicDetail := &sarama.TopicDetail{
+			NumPartitions:     int32(numPartitions),
+			ReplicationFactor: int16(replicationFactor),
+		}
+		if err := adminClient.CreateTopic(topic, topicDetail, false); err != nil {
+			log.Fatalf("failed to create topic: %v", err)
+		}
+	}
+}
+
+func NewKafkaSyncProducer(opt *KafkaProducerOptions) sarama.SyncProducer {
 	config := opt.SaramaConfig
 	if config == nil {
 		config = sarama.NewConfig()
@@ -40,10 +82,10 @@ func NewKafkaSyncProducer(opt *KafkaProducerOptions) *sarama.SyncProducer {
 		log.Fatalf("failed to create kafka producer: %v", err)
 	}
 
-	return &producer
+	return producer
 }
 
-func NewKafkaAsyncProducer(opt *KafkaProducerOptions) *sarama.AsyncProducer {
+func NewKafkaAsyncProducer(opt *KafkaProducerOptions) sarama.AsyncProducer {
 	config := opt.SaramaConfig
 	if config == nil {
 		config = sarama.NewConfig()
@@ -59,10 +101,10 @@ func NewKafkaAsyncProducer(opt *KafkaProducerOptions) *sarama.AsyncProducer {
 		log.Fatalf("failed to create kafka producer: %v", err)
 	}
 
-	return &producer
+	return producer
 }
 
-func NewKafkaConsumerGroup(opt *KafkaConsumerOptions) *sarama.ConsumerGroup {
+func NewKafkaConsumerGroup(opt *KafkaConsumerOptions) sarama.ConsumerGroup {
 	config := opt.SaramaConfig
 	if config == nil {
 		config = sarama.NewConfig()
@@ -75,5 +117,5 @@ func NewKafkaConsumerGroup(opt *KafkaConsumerOptions) *sarama.ConsumerGroup {
 		log.Fatalf("failed to create kafka consumer group: %v", err)
 	}
 
-	return &consumerGroup
+	return consumerGroup
 }
