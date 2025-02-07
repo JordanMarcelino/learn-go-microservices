@@ -37,6 +37,10 @@ func NewPostgres(opt *PostgresOptions) *sqlx.DB {
 		log.Fatalf("error connecting to database: %v", err)
 	}
 
+	if err := db.Ping(); err != nil {
+		log.Fatalf("error pinging to database: %v", err)
+	}
+
 	db.SetMaxIdleConns(opt.MaxIdleConn)
 	db.SetMaxOpenConns(opt.MaxOpenConn)
 	db.SetConnMaxLifetime(time.Duration(opt.MaxConnLifetime) * time.Minute)
