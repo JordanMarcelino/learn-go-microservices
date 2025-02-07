@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 
+	"github.com/jordanmarcelino/learn-go-microservices/pkg/mq"
 	"github.com/jordanmarcelino/learn-go-microservices/product-service/internal/dto"
 	"github.com/jordanmarcelino/learn-go-microservices/product-service/internal/entity"
 	"github.com/jordanmarcelino/learn-go-microservices/product-service/internal/repository"
@@ -13,14 +14,17 @@ type ProductUseCase interface {
 }
 
 type productUseCase struct {
-	DataStore repository.DataStore
+	DataStore              repository.DataStore
+	ProductCreatedProducer mq.KafkaProducer
 }
 
 func NewProductUseCase(
 	dataStore repository.DataStore,
+	ProductCreatedProducer mq.KafkaProducer,
 ) ProductUseCase {
 	return &productUseCase{
-		DataStore: dataStore,
+		DataStore:              dataStore,
+		ProductCreatedProducer: ProductCreatedProducer,
 	}
 }
 
@@ -31,6 +35,10 @@ func (u *productUseCase) Create(ctx context.Context, req *dto.CreateProductReque
 
 		product := &entity.Product{Name: req.Name, Description: req.Description, Price: req.Price, Quantity: req.Quantity}
 		if err := productRepository.Save(ctx, product); err != nil {
+			return err
+		}
+
+		if err := u.ProductCreatedProducer.Send(ctx, dto.ToProductCreatedEvent(product)); err != nil {
 			return err
 		}
 
