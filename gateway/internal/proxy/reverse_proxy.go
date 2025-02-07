@@ -1,12 +1,15 @@
 package proxy
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jordanmarcelino/learn-go-microservices/gateway/internal/log"
+	"github.com/jordanmarcelino/learn-go-microservices/pkg/constant"
+	"github.com/jordanmarcelino/learn-go-microservices/pkg/utils/ginutils"
 )
 
 func NewReverseProxy(target string) gin.HandlerFunc {
@@ -36,6 +39,11 @@ func NewReverseProxy(target string) gin.HandlerFunc {
 			req.URL.Host = url.Host
 			req.URL.Path = ctx.Param("path")
 			req.Header = ctx.Request.Header
+
+			if userID := ginutils.GetUserID(ctx); userID != 0 {
+				req.Header.Set(constant.X_USER_ID, fmt.Sprintf("%d", userID))
+			}
+
 		}
 
 		proxy.ServeHTTP(ctx.Writer, ctx.Request)
