@@ -13,7 +13,7 @@ const (
 	linkFormat = "%v%v?%v"
 )
 
-func CreateLinks(r *http.Request, page, size, totalItem, totalPage int) *dto.Links {
+func NewLinks(r *http.Request, page, size, totalItem, totalPage int) *dto.Links {
 	queries := r.URL.Query()
 	host := r.Host
 	path := r.URL.Path
