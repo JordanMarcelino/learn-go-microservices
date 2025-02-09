@@ -77,9 +77,9 @@ func (p *ProductCreatedProducer) Retry() {
 
 		select {
 		case p.Producer.Input() <- msg:
-			log.Logger.Infof("Retrying message (attempt %d) to topic %s", metadata.Retry, msg.Topic)
+			log.Logger.Infof("retrying message (attempt %d) to topic %s", metadata.Retry, msg.Topic)
 		default:
-			log.Logger.Infof("Failed to retry message (attempt %d) to topic %s", metadata.Retry, msg.Topic)
+			log.Logger.Infof("failed to retry message (attempt %d) to topic %s", metadata.Retry, msg.Topic)
 		}
 	}
 }

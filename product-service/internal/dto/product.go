@@ -22,6 +22,21 @@ type CreateProductRequest struct {
 	Quantity    int             `json:"quantity" binding:"required,min=0"`
 }
 
+type SearchProductRequest struct {
+	Name        string `form:"name"`
+	Description string `form:"description"`
+	Limit       int64  `form:"limit" binding:"gte=1,lte=25"`
+	Page        int64  `form:"page" binding:"gte=1"`
+}
+
+func ToProductResponses(products []*entity.Product) []*ProductResponse {
+	res := []*ProductResponse{}
+	for _, product := range products {
+		res = append(res, ToProductResponse(product))
+	}
+	return res
+}
+
 func ToProductResponse(product *entity.Product) *ProductResponse {
 	return &ProductResponse{
 		ID:          product.ID,
