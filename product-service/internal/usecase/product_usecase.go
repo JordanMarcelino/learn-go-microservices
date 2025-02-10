@@ -16,6 +16,7 @@ type ProductUseCase interface {
 	Search(ctx context.Context, req *SearchProductRequest) ([]*ProductResponse, *PageMetaData, error)
 	Get(ctx context.Context, req *GetProductRequest) (*ProductResponse, error)
 	Create(ctx context.Context, req *CreateProductRequest) (*ProductResponse, error)
+	Update(ctx context.Context, req *UpdateProductRequest) (*ProductResponse, error)
 	Delete(ctx context.Context, req *DeleteProductRequest) error
 }
 
@@ -75,6 +76,39 @@ func (u *productUseCase) Create(ctx context.Context, req *CreateProductRequest) 
 		}
 
 		if err := u.ProductCreatedProducer.Send(ctx, ToProductCreatedEvent(product)); err != nil {
+			return err
+		}
+
+		res = ToProductResponse(product)
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (u *productUseCase) Update(ctx context.Context, req *UpdateProductRequest) (*ProductResponse, error) {
+	res := new(ProductResponse)
+	err := u.DataStore.Atomic(ctx, func(ds repository.DataStore) error {
+		productRepository := ds.ProductRepository()
+
+		product, err := productRepository.FindByID(ctx, req.ID)
+		if err != nil {
+			return err
+		}
+		if product == nil {
+			return httperror.NewProductNotFoundError()
+		}
+
+		product.Name = req.Name
+		product.Description = req.Description
+		product.Price = req.Price
+		product.Quantity = req.Quantity
+
+		if err := productRepository.Update(ctx, product); err != nil {
 			return err
 		}
 

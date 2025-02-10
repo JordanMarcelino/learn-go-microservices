@@ -22,6 +22,14 @@ type CreateProductRequest struct {
 	Quantity    int             `json:"quantity" binding:"required,min=0"`
 }
 
+type UpdateProductRequest struct {
+	ID          int64
+	Name        string          `json:"name" binding:"required,max=255"`
+	Description string          `json:"description" binding:"required"`
+	Price       decimal.Decimal `json:"price" binding:"required,dgt=0"`
+	Quantity    int             `json:"quantity" binding:"required,min=0"`
+}
+
 type GetProductRequest struct {
 	ID int64
 }

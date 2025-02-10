@@ -28,6 +28,7 @@ func (c *ProductController) Route(r *gin.Engine) {
 	g := r.Use(middleware.AuthMiddleware)
 	{
 		g.POST("", c.Create)
+		g.PUT("/:productId", c.Update)
 		g.DELETE("/:productId", c.Delete)
 	}
 
@@ -86,6 +87,29 @@ func (c *ProductController) Create(ctx *gin.Context) {
 		return
 	}
 	ginutils.ResponseCreated(ctx, res)
+}
+
+func (c *ProductController) Update(ctx *gin.Context) {
+	param := ctx.Param("productId")
+	productId, err := strconv.ParseInt(param, 10, 64)
+	if err != nil {
+		ctx.Error(httperror.NewInvalidURLParamError(param))
+		return
+	}
+
+	req := &dto.UpdateProductRequest{ID: productId}
+	if err := ctx.ShouldBindJSON(req); err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	res, err := c.productUseCase.Update(ctx, req)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ginutils.ResponseOK(ctx, res)
 }
 
 func (c *ProductController) Delete(ctx *gin.Context) {
