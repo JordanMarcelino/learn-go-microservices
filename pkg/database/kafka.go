@@ -48,7 +48,6 @@ func (admin *KafkaAdmin) CreateTopic(topic string, numPartitions int, replicatio
 	if err != nil {
 		log.Fatalf("failed to create kafka admin: %v", err)
 	}
-	defer adminClient.Close()
 
 	topics, err := adminClient.ListTopics()
 	if err != nil {
