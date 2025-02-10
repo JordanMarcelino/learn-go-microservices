@@ -22,15 +22,18 @@ type ProductUseCase interface {
 type productUseCase struct {
 	DataStore              repository.DataStore
 	ProductCreatedProducer mq.KafkaProducer
+	ProductDeletedProducer mq.KafkaProducer
 }
 
 func NewProductUseCase(
 	dataStore repository.DataStore,
 	ProductCreatedProducer mq.KafkaProducer,
+	ProductDeletedProducer mq.KafkaProducer,
 ) ProductUseCase {
 	return &productUseCase{
 		DataStore:              dataStore,
 		ProductCreatedProducer: ProductCreatedProducer,
+		ProductDeletedProducer: ProductDeletedProducer,
 	}
 }
 
@@ -98,6 +101,10 @@ func (u *productUseCase) Delete(ctx context.Context, req *DeleteProductRequest) 
 			return httperror.NewProductNotFoundError()
 		}
 
-		return productRepository.DeleteByID(ctx, product.ID)
+		if err := productRepository.DeleteByID(ctx, product.ID); err != nil {
+			return err
+		}
+
+		return u.ProductDeletedProducer.Send(ctx, ToProductDeletedEvent(product))
 	})
 }
