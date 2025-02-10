@@ -26,6 +26,10 @@ type GetProductRequest struct {
 	ID int64
 }
 
+type DeleteProductRequest struct {
+	ID int64
+}
+
 type SearchProductRequest struct {
 	Name        string `form:"name"`
 	Description string `form:"description"`

@@ -15,6 +15,7 @@ type ProductRepository interface {
 	Search(ctx context.Context, req *dto.SearchProductRequest) ([]*entity.Product, int64, error)
 	FindByID(ctx context.Context, id int64) (*entity.Product, error)
 	Save(ctx context.Context, product *entity.Product) error
+	DeleteByID(ctx context.Context, id int64) error
 }
 
 type productRepository struct {
@@ -99,4 +100,16 @@ func (r *productRepository) Save(ctx context.Context, product *entity.Product) e
 	`
 
 	return r.DB.QueryRowContext(ctx, query, product.Name, product.Description, product.Price, product.Quantity).Scan(&product.ID, &product.CreatedAt, &product.UpdatedAt)
+}
+
+func (r *productRepository) DeleteByID(ctx context.Context, id int64) error {
+	query := `
+		DELETE FROM
+			products
+		WHERE
+			id = $1
+	`
+
+	_, err := r.DB.ExecContext(ctx, query, id)
+	return err
 }
