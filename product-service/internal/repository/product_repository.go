@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/jordanmarcelino/learn-go-microservices/pkg/utils/pageutils"
@@ -11,6 +13,7 @@ import (
 
 type ProductRepository interface {
 	Search(ctx context.Context, req *dto.SearchProductRequest) ([]*entity.Product, int64, error)
+	FindByID(ctx context.Context, id int64) (*entity.Product, error)
 	Save(ctx context.Context, product *entity.Product) error
 }
 
@@ -60,6 +63,29 @@ func (r *productRepository) Search(ctx context.Context, req *dto.SearchProductRe
 	}
 
 	return products, total, nil
+}
+
+func (r *productRepository) FindByID(ctx context.Context, id int64) (*entity.Product, error) {
+	query := `
+		SELECT
+			name, description, price, quantity, created_at, updated_at
+		FROM
+			products
+		WHERE
+			id = $1
+	`
+
+	product := &entity.Product{ID: id}
+	err := r.DB.QueryRowContext(ctx, query, id).Scan(&product.Name, &product.Description, &product.Price, &product.Quantity,
+		&product.CreatedAt, &product.UpdatedAt)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return product, nil
 }
 
 func (r *productRepository) Save(ctx context.Context, product *entity.Product) error {

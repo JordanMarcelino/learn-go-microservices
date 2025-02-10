@@ -15,7 +15,7 @@ import (
 
 func Start() {
 	cfg := config.InitConfig()
-	log.SetLogger(logger.NewZapLogger(cfg.Logger.Level))
+	log.SetLogger(logger.NewLogrusLogger(cfg.Logger.Level))
 	provider.BootstrapGlobal(cfg)
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)

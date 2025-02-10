@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jordanmarcelino/learn-go-microservices/pkg/constant"
+	"github.com/jordanmarcelino/learn-go-microservices/pkg/httperror"
 	"github.com/jordanmarcelino/learn-go-microservices/pkg/utils/ginutils"
 	"github.com/jordanmarcelino/learn-go-microservices/pkg/utils/pageutils"
 	"github.com/jordanmarcelino/learn-go-microservices/product-service/internal/dto"
@@ -26,24 +27,11 @@ func NewProductController(productUseCase usecase.ProductUseCase) *ProductControl
 func (c *ProductController) Route(r *gin.Engine) {
 	g := r.Use(middleware.AuthMiddleware)
 	{
-		g.GET("", c.Search)
 		g.POST("", c.Create)
 	}
-}
 
-func (c *ProductController) Create(ctx *gin.Context) {
-	req := new(dto.CreateProductRequest)
-	if err := ctx.ShouldBindJSON(req); err != nil {
-		ctx.Error(err)
-		return
-	}
-
-	res, err := c.productUseCase.Create(ctx, req)
-	if err != nil {
-		ctx.Error(err)
-		return
-	}
-	ginutils.ResponseCreated(ctx, res)
+	r.GET("", c.Search)
+	r.GET("/:productId", c.Get)
 }
 
 func (c *ProductController) Search(ctx *gin.Context) {
@@ -64,4 +52,37 @@ func (c *ProductController) Search(ctx *gin.Context) {
 
 	paging.Links = pageutils.NewLinks(ctx.Request, int(paging.Page), int(paging.Size), int(paging.TotalItem), int(paging.TotalPage))
 	ginutils.ResponseOKPagination(ctx, res, paging)
+}
+
+func (c *ProductController) Get(ctx *gin.Context) {
+	param := ctx.Param("productId")
+	productId, err := strconv.ParseInt(param, 10, 64)
+	if err != nil {
+		ctx.Error(httperror.NewInvalidURLParamError(param))
+		return
+	}
+
+	req := &dto.GetProductRequest{ID: productId}
+	res, err := c.productUseCase.Get(ctx, req)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ginutils.ResponseOK(ctx, res)
+}
+
+func (c *ProductController) Create(ctx *gin.Context) {
+	req := new(dto.CreateProductRequest)
+	if err := ctx.ShouldBindJSON(req); err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	res, err := c.productUseCase.Create(ctx, req)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+	ginutils.ResponseCreated(ctx, res)
 }

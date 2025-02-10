@@ -8,11 +8,13 @@ import (
 	"github.com/jordanmarcelino/learn-go-microservices/pkg/utils/pageutils"
 	. "github.com/jordanmarcelino/learn-go-microservices/product-service/internal/dto"
 	"github.com/jordanmarcelino/learn-go-microservices/product-service/internal/entity"
+	"github.com/jordanmarcelino/learn-go-microservices/product-service/internal/httperror"
 	"github.com/jordanmarcelino/learn-go-microservices/product-service/internal/repository"
 )
 
 type ProductUseCase interface {
 	Search(ctx context.Context, req *SearchProductRequest) ([]*ProductResponse, *PageMetaData, error)
+	Get(ctx context.Context, req *GetProductRequest) (*ProductResponse, error)
 	Create(ctx context.Context, req *CreateProductRequest) (*ProductResponse, error)
 }
 
@@ -42,6 +44,20 @@ func (u *productUseCase) Search(ctx context.Context, req *SearchProductRequest) 
 	res := ToProductResponses(products)
 	metadata := pageutils.NewMetadata(total, req.Page, req.Limit)
 	return res, metadata, nil
+}
+
+func (u *productUseCase) Get(ctx context.Context, req *GetProductRequest) (*ProductResponse, error) {
+	productRepository := u.DataStore.ProductRepository()
+
+	product, err := productRepository.FindByID(ctx, req.ID)
+	if err != nil {
+		return nil, err
+	}
+	if product == nil {
+		return nil, httperror.NewProductNotFoundError()
+	}
+
+	return ToProductResponse(product), nil
 }
 
 func (u *productUseCase) Create(ctx context.Context, req *CreateProductRequest) (*ProductResponse, error) {
