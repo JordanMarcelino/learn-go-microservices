@@ -23,17 +23,20 @@ type ProductUseCase interface {
 type productUseCase struct {
 	DataStore              repository.DataStore
 	ProductCreatedProducer mq.KafkaProducer
+	ProductUpdatedProducer mq.KafkaProducer
 	ProductDeletedProducer mq.KafkaProducer
 }
 
 func NewProductUseCase(
 	dataStore repository.DataStore,
 	ProductCreatedProducer mq.KafkaProducer,
+	ProductUpdatedProducer mq.KafkaProducer,
 	ProductDeletedProducer mq.KafkaProducer,
 ) ProductUseCase {
 	return &productUseCase{
 		DataStore:              dataStore,
 		ProductCreatedProducer: ProductCreatedProducer,
+		ProductUpdatedProducer: ProductUpdatedProducer,
 		ProductDeletedProducer: ProductDeletedProducer,
 	}
 }
@@ -109,6 +112,10 @@ func (u *productUseCase) Update(ctx context.Context, req *UpdateProductRequest) 
 		product.Quantity = req.Quantity
 
 		if err := productRepository.Update(ctx, product); err != nil {
+			return err
+		}
+
+		if err := u.ProductUpdatedProducer.Send(ctx, ToProductUpdatedEvent(product)); err != nil {
 			return err
 		}
 
