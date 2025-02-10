@@ -22,6 +22,10 @@ type CreateProductRequest struct {
 	Quantity    int             `json:"quantity" binding:"required,min=0"`
 }
 
+type GetProductRequest struct {
+	ID int64
+}
+
 type SearchProductRequest struct {
 	Name        string `form:"name"`
 	Description string `form:"description"`
