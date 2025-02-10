@@ -28,6 +28,7 @@ func (c *ProductController) Route(r *gin.Engine) {
 	g := r.Use(middleware.AuthMiddleware)
 	{
 		g.POST("", c.Create)
+		g.DELETE("/:productId", c.Delete)
 	}
 
 	r.GET("", c.Search)
@@ -85,4 +86,21 @@ func (c *ProductController) Create(ctx *gin.Context) {
 		return
 	}
 	ginutils.ResponseCreated(ctx, res)
+}
+
+func (c *ProductController) Delete(ctx *gin.Context) {
+	param := ctx.Param("productId")
+	productId, err := strconv.ParseInt(param, 10, 64)
+	if err != nil {
+		ctx.Error(httperror.NewInvalidURLParamError(param))
+		return
+	}
+
+	req := &dto.DeleteProductRequest{ID: productId}
+	if err := c.productUseCase.Delete(ctx, req); err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ginutils.ResponseOKPlain(ctx)
 }

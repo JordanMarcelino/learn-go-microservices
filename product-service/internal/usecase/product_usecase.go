@@ -16,6 +16,7 @@ type ProductUseCase interface {
 	Search(ctx context.Context, req *SearchProductRequest) ([]*ProductResponse, *PageMetaData, error)
 	Get(ctx context.Context, req *GetProductRequest) (*ProductResponse, error)
 	Create(ctx context.Context, req *CreateProductRequest) (*ProductResponse, error)
+	Delete(ctx context.Context, req *DeleteProductRequest) error
 }
 
 type productUseCase struct {
@@ -83,4 +84,20 @@ func (u *productUseCase) Create(ctx context.Context, req *CreateProductRequest) 
 	}
 
 	return res, nil
+}
+
+func (u *productUseCase) Delete(ctx context.Context, req *DeleteProductRequest) error {
+	return u.DataStore.Atomic(ctx, func(ds repository.DataStore) error {
+		productRepository := ds.ProductRepository()
+
+		product, err := productRepository.FindByID(ctx, req.ID)
+		if err != nil {
+			return err
+		}
+		if product == nil {
+			return httperror.NewProductNotFoundError()
+		}
+
+		return productRepository.DeleteByID(ctx, product.ID)
+	})
 }

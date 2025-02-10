@@ -15,7 +15,7 @@ type ProductCreatedEvent struct {
 	Quantity    int             `json:"quantity"`
 }
 
-func (e ProductCreatedEvent) ID() string {
+func (e *ProductCreatedEvent) ID() string {
 	return fmt.Sprintf("%d", e.Id)
 }
 
@@ -26,5 +26,19 @@ func ToProductCreatedEvent(product *entity.Product) *ProductCreatedEvent {
 		Description: product.Description,
 		Price:       product.Price,
 		Quantity:    product.Quantity,
+	}
+}
+
+type ProductDeletedEvent struct {
+	Id int64 `json:"id"`
+}
+
+func (e *ProductDeletedEvent) ID() string {
+	return fmt.Sprintf("%d", e.Id)
+}
+
+func ToProductDeletedEvent(product *entity.Product) *ProductDeletedEvent {
+	return &ProductDeletedEvent{
+		Id: product.ID,
 	}
 }
