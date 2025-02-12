@@ -2,7 +2,7 @@ package mq
 
 import "context"
 
-type KafkaHandler func(ctx context.Context, event KafkaEvent) error
+type KafkaHandler func(ctx context.Context, body []byte) error
 
 type KafkaConsumer interface {
 	Consume(ctx context.Context) error
