@@ -85,15 +85,15 @@ func (c *ProductUpdatedConsumer) ConsumeClaim(sess sarama.ConsumerGroupSession, 
 	for message := range claim.Messages() {
 		log.Logger.Infof("topic %v received a message %v", c.Topic(), string(message.Value))
 
-		for i := 1; i <= constant.KafkaRetryLimit; i++ {
+		for i := 1; i <= constant.KafkaConsumerRetryLimit+1; i++ {
 			if err := c.Handler()(sess.Context(), message.Value); err != nil {
 				log.Logger.Errorf("failed to consume message: %s", err)
 
-				if i == constant.KafkaRetryLimit {
-					log.Logger.Errorf("failed to consume message after %d retries: %s", constant.KafkaRetryLimit, err)
+				if i > constant.KafkaConsumerRetryLimit {
+					log.Logger.Errorf("failed to consume message after %d retries: %s", constant.KafkaConsumerRetryLimit, err)
 				} else {
-					delay := math.Pow(constant.KafkaRetryDelay, float64(i))
-					time.Sleep(time.Duration(delay))
+					delay := math.Pow(constant.KafkaConsumerRetryDelay, float64(i))
+					time.Sleep(time.Duration(delay) * time.Second)
 					log.Logger.Infof("retrying to consume message, attempt %d", i)
 				}
 			} else {
@@ -101,7 +101,6 @@ func (c *ProductUpdatedConsumer) ConsumeClaim(sess sarama.ConsumerGroupSession, 
 				break
 			}
 		}
-
 	}
 
 	return nil
