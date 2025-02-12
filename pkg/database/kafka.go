@@ -108,7 +108,6 @@ func NewKafkaConsumerGroup(opt *KafkaConsumerOptions) sarama.ConsumerGroup {
 	if config == nil {
 		config = sarama.NewConfig()
 	}
-	config.Consumer.Return.Errors = true
 	config.Consumer.Offsets.Initial = opt.InitialOffset
 
 	consumerGroup, err := sarama.NewConsumerGroup(opt.Brokers, opt.ConsumerGroup, config)
