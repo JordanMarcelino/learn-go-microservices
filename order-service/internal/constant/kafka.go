@@ -23,6 +23,6 @@ const (
 )
 
 const (
-	KafkaRetryDelay = 3
-	KafkaRetryLimit = 3
+	KafkaConsumerRetryDelay = 2
+	KafkaConsumerRetryLimit = 3
 )
