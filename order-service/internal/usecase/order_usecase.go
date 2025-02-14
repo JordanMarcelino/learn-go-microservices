@@ -8,6 +8,8 @@ import (
 	. "github.com/jordanmarcelino/learn-go-microservices/order-service/internal/dto"
 	"github.com/jordanmarcelino/learn-go-microservices/order-service/internal/entity"
 	"github.com/jordanmarcelino/learn-go-microservices/order-service/internal/httperror"
+	"github.com/jordanmarcelino/learn-go-microservices/pkg/mq"
+
 	"github.com/jordanmarcelino/learn-go-microservices/order-service/internal/repository"
 	"github.com/jordanmarcelino/learn-go-microservices/order-service/internal/utils/redisutils"
 	"github.com/shopspring/decimal"
@@ -18,17 +20,20 @@ type OrderUseCase interface {
 }
 
 type orderUseCaseImpl struct {
-	DataStore      repository.DataStore
-	LockRepository repository.LockRepository
+	DataStore            repository.DataStore
+	LockRepository       repository.LockRepository
+	OrderCreatedProducer mq.KafkaProducer
 }
 
 func NewOrderUseCase(
 	dataStore repository.DataStore,
 	lockRepository repository.LockRepository,
+	orderCreatedProducer mq.KafkaProducer,
 ) OrderUseCase {
 	return &orderUseCaseImpl{
-		DataStore:      dataStore,
-		LockRepository: lockRepository,
+		DataStore:            dataStore,
+		LockRepository:       lockRepository,
+		OrderCreatedProducer: orderCreatedProducer,
 	}
 }
 
@@ -95,6 +100,10 @@ func (u *orderUseCaseImpl) Save(ctx context.Context, req *CreateOrderRequest) (*
 			return err
 		}
 		if err := orderRepository.Save(ctx, order); err != nil {
+			return err
+		}
+
+		if err := u.OrderCreatedProducer.Send(ctx, ToOrderCreatedEvent(order)); err != nil {
 			return err
 		}
 
