@@ -8,6 +8,7 @@ import (
 
 type Order struct {
 	ID          int64
+	RequestID   string
 	CustomerID  int64
 	TotalAmount decimal.Decimal
 	Description string
