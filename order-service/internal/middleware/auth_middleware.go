@@ -15,5 +15,13 @@ func AuthMiddleware(ctx *gin.Context) {
 		return
 	}
 
+	email, ok := ginutils.GetXEmail(ctx)
+	if !ok {
+		ctx.Error(httperror.NewUnauthorizedError())
+		ctx.Abort()
+		return
+	}
+
 	ctx.Set(constant.CTX_USER_ID, userID)
+	ctx.Set(constant.CTX_EMAIL, email)
 }

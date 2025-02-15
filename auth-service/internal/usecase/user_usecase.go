@@ -35,19 +35,19 @@ type userUseCaseImpl struct {
 
 func NewUserUseCase(
 	hasher encryptutils.Hasher,
-	JwtUtil jwtutils.JwtUtil,
+	jwtUtil jwtutils.JwtUtil,
 	dataStore repository.DataStore,
-	RedisRepository repository.RedisRepository,
+	redisRepository repository.RedisRepository,
 	sendVerificationProducer mq.AMQPProducer,
-	AccountVerifiedProducer mq.AMQPProducer,
+	accountVerifiedProducer mq.AMQPProducer,
 ) UserUseCase {
 	return &userUseCaseImpl{
 		Hasher:                   hasher,
-		JwtUtil:                  JwtUtil,
+		JwtUtil:                  jwtUtil,
 		DataStore:                dataStore,
-		RedisRepository:          RedisRepository,
+		RedisRepository:          redisRepository,
 		SendVerificationProducer: sendVerificationProducer,
-		AccountVerifiedProducer:  AccountVerifiedProducer,
+		AccountVerifiedProducer:  accountVerifiedProducer,
 	}
 }
 
@@ -72,7 +72,7 @@ func (u *userUseCaseImpl) Login(ctx context.Context, req *dto.LoginRequest) (*dt
 			return httperror.NewUserNotVerifiedError()
 		}
 
-		token, err := u.JwtUtil.Sign(user.ID)
+		token, err := u.JwtUtil.Sign(&jwtutils.JWTPayload{UserID: user.ID, Email: user.Email})
 		if err != nil {
 			return err
 		}

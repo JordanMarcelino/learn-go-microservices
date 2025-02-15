@@ -36,6 +36,7 @@ func (m *AuthMiddleware) Authorization() gin.HandlerFunc {
 		}
 
 		ctx.Set(constant.CTX_USER_ID, claims.UserID)
+		ctx.Set(constant.CTX_EMAIL, claims.Email)
 		ctx.Next()
 	}
 }

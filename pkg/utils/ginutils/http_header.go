@@ -15,3 +15,11 @@ func GetXUserID(ctx *gin.Context) (int64, bool) {
 	}
 	return userID, true
 }
+
+func GetXEmail(ctx *gin.Context) (string, bool) {
+	xEmail := ctx.GetHeader(constant.X_EMAIL)
+	if xEmail == "" {
+		return "", false
+	}
+	return xEmail, true
+}
