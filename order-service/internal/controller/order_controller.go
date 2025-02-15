@@ -26,7 +26,7 @@ func (c *OrderController) Route(r *gin.Engine) {
 }
 
 func (c *OrderController) Create(ctx *gin.Context) {
-	req := &dto.CreateOrderRequest{CustomerID: ginutils.GetUserID(ctx)}
+	req := &dto.CreateOrderRequest{CustomerID: ginutils.GetUserID(ctx), CustomerEmail: ginutils.GetEmail(ctx)}
 	if err := ctx.ShouldBindJSON(req); err != nil {
 		ctx.Error(err)
 		return

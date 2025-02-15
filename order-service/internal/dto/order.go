@@ -23,10 +23,11 @@ type OrderItemResponse struct {
 }
 
 type CreateOrderRequest struct {
-	CustomerID  int64
-	RequestID   string              `json:"request_id" binding:"required"`
-	Description string              `json:"description"`
-	Items       []*OrderItemRequest `json:"items" binding:"required,min=1,dive"`
+	CustomerID    int64
+	CustomerEmail string
+	RequestID     string              `json:"request_id" binding:"required"`
+	Description   string              `json:"description"`
+	Items         []*OrderItemRequest `json:"items" binding:"required,min=1,dive"`
 }
 
 type OrderItemRequest struct {
