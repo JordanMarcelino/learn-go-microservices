@@ -10,13 +10,19 @@ import (
 )
 
 type JwtUtil interface {
-	Sign(userID int64) (string, error)
+	Sign(payload *JWTPayload) (string, error)
 	Parse(token string) (*JWTClaims, error)
 }
 
 type JWTClaims struct {
 	jwt.RegisteredClaims
-	UserID int64 `json:"user_id"`
+	UserID int64  `json:"user_id"`
+	Email  string `json:"email"`
+}
+
+type JWTPayload struct {
+	UserID int64
+	Email  string
 }
 
 type jwtUtil struct {
@@ -29,11 +35,12 @@ func NewJwtUtil() JwtUtil {
 	}
 }
 
-func (j *jwtUtil) Sign(userID int64) (string, error) {
+func (j *jwtUtil) Sign(payload *JWTPayload) (string, error) {
 	currentTime := time.Now()
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, JWTClaims{
-		UserID: userID,
+		UserID: payload.UserID,
+		Email:  payload.Email,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ID:        uuid.NewString(),
 			IssuedAt:  jwt.NewNumericDate(currentTime),
