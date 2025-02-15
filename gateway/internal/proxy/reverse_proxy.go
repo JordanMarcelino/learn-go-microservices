@@ -43,6 +43,9 @@ func NewReverseProxy(target string) gin.HandlerFunc {
 			if userID := ginutils.GetUserID(ctx); userID != 0 {
 				req.Header.Set(constant.X_USER_ID, fmt.Sprintf("%d", userID))
 			}
+			if email := ginutils.GetEmail(ctx); email != "" {
+				req.Header.Set(constant.X_EMAIL, email)
+			}
 
 		}
 
