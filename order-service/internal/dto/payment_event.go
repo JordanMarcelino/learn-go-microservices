@@ -3,8 +3,8 @@ package dto
 import "github.com/jordanmarcelino/learn-go-microservices/order-service/internal/constant"
 
 type PaymentReminderEvent struct {
-	Email   string `json:"email"`
 	OrderID int64  `json:"order_id"`
+	Email   string `json:"email"`
 }
 
 func (e PaymentReminderEvent) Key() string {
