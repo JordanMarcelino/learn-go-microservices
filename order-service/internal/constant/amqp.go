@@ -4,6 +4,10 @@ const (
 	PaymentReminderExchange = "notifications"
 	PaymentReminderKey      = "send.payment.reminder"
 	PaymentReminderQueue    = "reminder"
+
+	AutoCancelExchange = "orders"
+	AutoCancelKey      = "order.auto.cancel"
+	AutoCancelQueue    = "order-auto-cancel"
 )
 
 const (
