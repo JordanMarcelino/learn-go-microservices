@@ -117,7 +117,7 @@ func (u *orderUseCaseImpl) Save(ctx context.Context, req *CreateOrderRequest) (*
 			return err
 		}
 
-		if err := u.AutoCancelProducer.Send(ctx, &AutoCancelEvent{OrderID: order.ID}); err != nil {
+		if err := u.AutoCancelProducer.Send(ctx, &AutoCancelEvent{OrderID: order.ID, Email: req.CustomerEmail}); err != nil {
 			return err
 		}
 

@@ -8,6 +8,10 @@ const (
 	AutoCancelExchange = "orders"
 	AutoCancelKey      = "order.auto.cancel"
 	AutoCancelQueue    = "order-auto-cancel"
+
+	CancelNotificationExchange = "notifications"
+	CancelNotificationKey      = "send.cancel.notification"
+	CancelNotificationQueue    = "cancel-notification"
 )
 
 const (

@@ -61,9 +61,19 @@ func ToOrderCancelledEvent(order *entity.Order) *OrderCancelledEvent {
 }
 
 type AutoCancelEvent struct {
-	OrderID int64 `json:"order_id"`
+	OrderID int64  `json:"order_id"`
+	Email   string `json:"email"`
 }
 
 func (e *AutoCancelEvent) Key() string {
 	return constant.AutoCancelKey
+}
+
+type CancelNotificationEvent struct {
+	OrderID int64  `json:"order_id"`
+	Email   string `json:"email"`
+}
+
+func (e *CancelNotificationEvent) Key() string {
+	return constant.CancelNotificationKey
 }
