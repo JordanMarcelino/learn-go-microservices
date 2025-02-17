@@ -24,6 +24,7 @@ type orderUseCaseImpl struct {
 	LockRepository          repository.LockRepository
 	OrderCreatedProducer    mq.KafkaProducer
 	PaymentReminderProducer mq.AMQPProducer
+	AutoCancelProducer      mq.AMQPProducer
 }
 
 func NewOrderUseCase(
@@ -31,12 +32,14 @@ func NewOrderUseCase(
 	lockRepository repository.LockRepository,
 	orderCreatedProducer mq.KafkaProducer,
 	paymentReminderProducer mq.AMQPProducer,
+	autoCancelProducer mq.AMQPProducer,
 ) OrderUseCase {
 	return &orderUseCaseImpl{
 		DataStore:               dataStore,
 		LockRepository:          lockRepository,
 		OrderCreatedProducer:    orderCreatedProducer,
 		PaymentReminderProducer: paymentReminderProducer,
+		AutoCancelProducer:      autoCancelProducer,
 	}
 }
 
@@ -111,6 +114,10 @@ func (u *orderUseCaseImpl) Save(ctx context.Context, req *CreateOrderRequest) (*
 		}
 
 		if err := u.PaymentReminderProducer.Send(ctx, &PaymentReminderEvent{OrderID: order.ID, Email: req.CustomerEmail}); err != nil {
+			return err
+		}
+
+		if err := u.AutoCancelProducer.Send(ctx, &AutoCancelEvent{OrderID: order.ID}); err != nil {
 			return err
 		}
 
