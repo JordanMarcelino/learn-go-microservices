@@ -3,6 +3,8 @@ package constant
 const (
 	SendVerificationSubject = "[Go Microservices] Email Verification"
 	AccountVerifiedSubject  = "[Go Microservices] Account Verified"
+	OrderCancelledSubject   = "[Go Microservices] Order Cancelled"
+	OrderSuccessSubject     = "[Go Microservices] Order Success"
 )
 
 const (
@@ -42,4 +44,44 @@ const (
 	</body>
 </html>
 	`
+
+	OrderCancelledTemplate = `
+<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+	</head>
+	<body>
+		<h1>Order Cancelled</h1>
+		<p>Dear User,</p>
+		<p>We regret to inform you that your order has been cancelled. Below are the details of your order:</p>
+		<p>Order ID: %v</p>
+		<p>Total Amount: %v</p>
+		<p>Description: %v</p>
+		<p>If you have any questions or need further assistance, please do not hesitate to contact us.</p>
+		<p>Best regards,</p>
+		<p>The Go Microservices Team</p>
+	</body>
+</html>
+	`
+
+	OrderSuccessTemplate = `
+<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+	</head>
+	<body>
+		<h1>Order Success</h1>
+		<p>Dear User,</p>
+		<p>We are pleased to inform you that your order has been successfully placed. Below are the details of your order:</p>
+		<p>Order ID: %v</p>
+		<p>Total Amount: %v</p>
+		<p>Description: %v</p>
+		<p>If you have any questions or need further assistance, please do not hesitate to contact us.</p>
+		<p>Best regards,</p>
+		<p>The Go Microservices Team</p>
+	</body>
+</html>
+`
 )

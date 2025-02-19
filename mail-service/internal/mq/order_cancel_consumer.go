@@ -10,23 +10,29 @@ import (
 	"github.com/bytedance/sonic"
 	"github.com/jordanmarcelino/learn-go-microservices/mail-service/internal/constant"
 	"github.com/jordanmarcelino/learn-go-microservices/mail-service/internal/dto"
+	"github.com/jordanmarcelino/learn-go-microservices/mail-service/internal/feign"
 	"github.com/jordanmarcelino/learn-go-microservices/mail-service/internal/log"
 	"github.com/jordanmarcelino/learn-go-microservices/pkg/mq"
 	"github.com/jordanmarcelino/learn-go-microservices/pkg/utils/smtputils"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-type AccountVerifiedConsumer struct {
-	Channel *amqp.Channel
-	Mailer  smtputils.Mailer
-	queue   string
-	wg      *sync.WaitGroup
+type OrderCancelConsumer struct {
+	Channel     *amqp.Channel
+	Mailer      smtputils.Mailer
+	OrderClient feign.OrderClient
+	queue       string
+	wg          *sync.WaitGroup
 }
 
-func NewAccountVerifiedConsumer(conn *amqp.Connection, mailer smtputils.Mailer) mq.AMQPConsumer {
-	queue := constant.AccountVerifiedQueue
-	exchange := constant.AccountVerifiedExchange
-	key := constant.AccountVerifiedKey
+func NewOrderCancelConsumer(
+	conn *amqp.Connection,
+	mailer smtputils.Mailer,
+	orderClient feign.OrderClient,
+) mq.AMQPConsumer {
+	queue := constant.CancelNotificationQueue
+	exchange := constant.CancelNotificationExchange
+	key := constant.CancelNotificationKey
 
 	ch, err := conn.Channel()
 	if err != nil {
@@ -41,15 +47,16 @@ func NewAccountVerifiedConsumer(conn *amqp.Connection, mailer smtputils.Mailer) 
 		log.Logger.Fatalf("failed to bind a queue: %s", err)
 	}
 
-	return &AccountVerifiedConsumer{
-		Channel: ch,
-		Mailer:  mailer,
-		queue:   queue,
-		wg:      &sync.WaitGroup{},
+	return &OrderCancelConsumer{
+		Channel:     ch,
+		Mailer:      mailer,
+		OrderClient: orderClient,
+		queue:       queue,
+		wg:          &sync.WaitGroup{},
 	}
 }
 
-func (c *AccountVerifiedConsumer) Consume(ctx context.Context, nWorker int) error {
+func (c *OrderCancelConsumer) Consume(ctx context.Context, nWorker int) error {
 	for i := 1; i <= nWorker; i++ {
 		c.wg.Add(1)
 		go c.Start(ctx, i)
@@ -57,7 +64,7 @@ func (c *AccountVerifiedConsumer) Consume(ctx context.Context, nWorker int) erro
 	return nil
 }
 
-func (c *AccountVerifiedConsumer) Start(ctx context.Context, workerID int) {
+func (c *OrderCancelConsumer) Start(ctx context.Context, workerID int) {
 	defer c.wg.Done()
 
 	msgs, err := c.Channel.ConsumeWithContext(ctx, c.Queue(), fmt.Sprintf("%v-%v", c.Queue(), workerID), false, false, false, false, nil)
@@ -97,23 +104,35 @@ func (c *AccountVerifiedConsumer) Start(ctx context.Context, workerID int) {
 	}
 }
 
-func (c *AccountVerifiedConsumer) Handler() mq.AMQPHandler {
+func (c *OrderCancelConsumer) Handler() mq.AMQPHandler {
 	return func(ctx context.Context, body []byte) error {
-		var event dto.AccountVerifiedEvent
+		var event dto.CancelNotificationEvent
 		if err := sonic.Unmarshal(body, &event); err != nil {
 			log.Logger.Errorf("failed to unmarshal message: %s", err)
 			return err
 		}
 
-		return c.Mailer.SendMail(ctx, event.Email, constant.AccountVerifiedSubject, constant.AccountVerifiedTemplate)
+		order, err := c.OrderClient.Get(ctx, &dto.GetOrderRequest{OrderID: event.OrderID, UserID: event.UserID, Email: event.Email})
+		if err != nil {
+			log.Logger.Errorf("failed to get order: %s", err)
+			return err
+		}
+
+		if order.Status == constant.ORDER_CANCELLED {
+			return c.Mailer.SendMail(ctx, event.Email, constant.OrderCancelledSubject, fmt.Sprintf(
+				constant.OrderCancelledTemplate, order.ID, order.TotalAmount, order.Description),
+			)
+		}
+
+		return nil
 	}
 }
 
-func (c *AccountVerifiedConsumer) Queue() string {
+func (c *OrderCancelConsumer) Queue() string {
 	return c.queue
 }
 
-func (c *AccountVerifiedConsumer) Close() error {
+func (c *OrderCancelConsumer) Close() error {
 	log.Logger.Infof("Closing consumer for queue: %s", c.Queue())
 	c.wg.Wait()
 	return c.Channel.Close()

@@ -77,15 +77,15 @@ func (c *SendVerificationConsumer) Start(ctx context.Context, workerID int) {
 			}
 
 			log.Logger.Infof("%v-%v: received a message %v", c.Queue(), workerID, string(msg.Body))
-			for i := 1; i <= constant.AMQPRetryLimit; i++ {
+			for i := 1; i <= constant.AMQPRetryLimit+1; i++ {
 				if err := c.Handler()(ctx, msg.Body); err != nil {
 					log.Logger.Errorf("failed to consume message: %s", err)
 
-					if i == constant.AMQPRetryLimit {
+					if i > constant.AMQPRetryLimit {
 						log.Logger.Errorf("failed to consume message after %d retries: %s", constant.AMQPRetryLimit, err)
 					} else {
 						delay := math.Pow(constant.AMQPRetryDelay, float64(i))
-						time.Sleep(time.Duration(delay) * constant.AMQPRetryDelay)
+						time.Sleep(time.Duration(delay) * time.Second)
 						log.Logger.Infof("retrying to consume message, attempt %d", i)
 					}
 				} else {
