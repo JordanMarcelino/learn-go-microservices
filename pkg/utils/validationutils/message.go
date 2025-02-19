@@ -27,6 +27,8 @@ func TagToMsg(fe validator.FieldError) string {
 		return fmt.Sprintf("%s must be greater than or equal to %v", fe.Field(), fe.Param())
 	case "lte":
 		return fmt.Sprintf("%s must be lower than or equal to %v", fe.Field(), fe.Param())
+	case "gtefield":
+		return fmt.Sprintf("%s must be greater than or equal to %v", fe.StructField(), fe.Param())
 	case "email":
 		return fmt.Sprintf("%s has invalid email format", fe.Field())
 	case "eq":
