@@ -9,6 +9,10 @@ const (
 	AccountVerifiedKey      = "account.verified"
 	AccountVerifiedQueue    = "verified"
 
+	PaymentReminderExchange = "notifications"
+	PaymentReminderKey      = "send.payment.reminder"
+	PaymentReminderQueue    = "reminder"
+
 	CancelNotificationExchange = "notifications"
 	CancelNotificationKey      = "send.cancel.notification"
 	CancelNotificationQueue    = "cancel-notification"

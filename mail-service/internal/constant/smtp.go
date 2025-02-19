@@ -3,6 +3,7 @@ package constant
 const (
 	SendVerificationSubject = "[Go Microservices] Email Verification"
 	AccountVerifiedSubject  = "[Go Microservices] Account Verified"
+	PaymentReminderSubject  = "[Go Microservices] Payment Reminder"
 	OrderCancelledSubject   = "[Go Microservices] Order Cancelled"
 	OrderSuccessSubject     = "[Go Microservices] Order Success"
 )
@@ -38,6 +39,28 @@ const (
 		<p>Dear User,</p>
 		<p>We are pleased to inform you that your account has been successfully verified.</p>
 		<p>You can now access all the features of our service.</p>
+		<p>If you have any questions or need further assistance, please do not hesitate to contact us.</p>
+		<p>Best regards,</p>
+		<p>The Go Microservices Team</p>
+	</body>
+</html>
+	`
+
+	PaymentReminderTemplate = `
+<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+	</head>
+	<body>
+		<h1>Payment Reminder</h1>
+		<p>Dear User,</p>
+		<p>This is a friendly reminder that your payment is due. Below are the details of your payment:</p>
+		<p>Order ID: %v</p>
+		<p>Total Amount: %v</p>
+		<p>Due Date: %v</p>
+		<p>Please make the payment by the due date to avoid any late fees.</p>
+		<p>If you have already made the payment, please disregard this email.</p>
 		<p>If you have any questions or need further assistance, please do not hesitate to contact us.</p>
 		<p>Best regards,</p>
 		<p>The Go Microservices Team</p>
@@ -83,5 +106,5 @@ const (
 		<p>The Go Microservices Team</p>
 	</body>
 </html>
-`
+	`
 )
