@@ -22,32 +22,39 @@ type OrderUseCase interface {
 	Get(ctx context.Context, req *GetOrderRequest) (*OrderResponse, error)
 	Save(ctx context.Context, req *CreateOrderRequest) (*OrderResponse, error)
 	Pay(ctx context.Context, req *PayOrderRequest) (*PaymentResponse, error)
+	Cancel(ctx context.Context, req *CancelOrderRequest) (*PaymentResponse, error)
 }
 
 type orderUseCaseImpl struct {
-	DataStore               repository.DataStore
-	LockRepository          repository.LockRepository
-	OrderCreatedProducer    mq.KafkaProducer
-	PaymentReminderProducer mq.AMQPProducer
-	AutoCancelProducer      mq.AMQPProducer
-	OrderSuccessProducer    mq.AMQPProducer
+	DataStore                  repository.DataStore
+	LockRepository             repository.LockRepository
+	OrderCreatedProducer       mq.KafkaProducer
+	OrderCancelledProducer     mq.KafkaProducer
+	CancelNotificationProducer mq.AMQPProducer
+	PaymentReminderProducer    mq.AMQPProducer
+	AutoCancelProducer         mq.AMQPProducer
+	OrderSuccessProducer       mq.AMQPProducer
 }
 
 func NewOrderUseCase(
 	dataStore repository.DataStore,
 	lockRepository repository.LockRepository,
 	orderCreatedProducer mq.KafkaProducer,
+	orderCancelledProducer mq.KafkaProducer,
+	cancelNotificationProducer mq.AMQPProducer,
 	paymentReminderProducer mq.AMQPProducer,
 	autoCancelProducer mq.AMQPProducer,
 	orderSuccessProducer mq.AMQPProducer,
 ) *orderUseCaseImpl {
 	return &orderUseCaseImpl{
-		DataStore:               dataStore,
-		LockRepository:          lockRepository,
-		OrderCreatedProducer:    orderCreatedProducer,
-		PaymentReminderProducer: paymentReminderProducer,
-		AutoCancelProducer:      autoCancelProducer,
-		OrderSuccessProducer:    orderSuccessProducer,
+		DataStore:                  dataStore,
+		LockRepository:             lockRepository,
+		OrderCreatedProducer:       orderCreatedProducer,
+		OrderCancelledProducer:     orderCancelledProducer,
+		CancelNotificationProducer: cancelNotificationProducer,
+		PaymentReminderProducer:    paymentReminderProducer,
+		AutoCancelProducer:         autoCancelProducer,
+		OrderSuccessProducer:       orderSuccessProducer,
 	}
 }
 
@@ -206,6 +213,67 @@ func (u *orderUseCaseImpl) Pay(ctx context.Context, req *PayOrderRequest) (*Paym
 		}
 
 		if err := u.OrderSuccessProducer.Send(ctx, &OrderSuccessEvent{OrderID: order.ID, UserID: req.CustomerID, Email: req.CustomerEmail}); err != nil {
+			return err
+		}
+
+		res = ToPaymentResponse(order)
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (u *orderUseCaseImpl) Cancel(ctx context.Context, req *CancelOrderRequest) (*PaymentResponse, error) {
+	lockKey := redisutils.NewLockKey(req.RequestID, req.CustomerID)
+	ttl := constant.CreateOrderTTL
+	opt := &redislock.Options{
+		RetryStrategy: redislock.LimitRetry(redislock.LinearBackoff(constant.CreateOrderRetryInterval), constant.CreateOrderRetryLimit),
+	}
+
+	lock, err := u.LockRepository.Get(ctx, lockKey, ttl, opt)
+	if err != nil {
+		return nil, err
+	}
+	defer lock.Release(ctx)
+
+	res := new(PaymentResponse)
+	err = u.DataStore.Atomic(ctx, func(ds repository.DataStore) error {
+		orderRepository := ds.OrderRepository()
+
+		order, err := orderRepository.FindByID(ctx, req.OrderID)
+		if err != nil {
+			return err
+		}
+		if order == nil {
+			return httperror.NewOrderNotFoundError()
+		}
+		if order.CustomerID != req.CustomerID {
+			return httperror.NewOrderNotFoundError()
+		}
+
+		if order.Status == constant.ORDER_SUCCESS {
+			return httperror.NewOrderAlreadyPaidError()
+		}
+		if order.Status == constant.ORDER_CANCELLED {
+			return httperror.NewOrderAlreadyCancelledError()
+		}
+
+		order.Status = constant.ORDER_CANCELLED
+		if err := orderRepository.UpdateStatus(ctx, order); err != nil {
+			return err
+		}
+
+		if err := u.OrderCancelledProducer.Send(ctx, ToOrderCancelledEvent(order)); err != nil {
+			return err
+		}
+
+		if err := u.CancelNotificationProducer.Send(ctx,
+			&CancelNotificationEvent{OrderID: order.ID, UserID: req.CustomerID, Email: req.CustomerEmail},
+		); err != nil {
 			return err
 		}
 

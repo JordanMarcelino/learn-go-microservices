@@ -41,6 +41,13 @@ type GetOrderRequest struct {
 	OrderID int64
 }
 
+type CancelOrderRequest struct {
+	CustomerID    int64
+	CustomerEmail string
+	RequestID     string `json:"request_id" binding:"required"`
+	OrderID       int64  `json:"order_id" binding:"required"`
+}
+
 type SearchOrderRequest struct {
 	StartDate time.Time `form:"start-date" time_format:"02-01-2006" binding:"required"`
 	EndDate   time.Time `form:"end-date" time_format:"02-01-2006" binding:"required,gtefield=StartDate"`

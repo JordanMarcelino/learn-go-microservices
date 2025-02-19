@@ -31,6 +31,7 @@ func (c *OrderController) Route(r *gin.Engine) {
 		g.GET("/:orderId", c.Get)
 
 		g.POST("/pay", c.Pay)
+		g.POST("/cancel", c.Cancel)
 	}
 
 }
@@ -96,6 +97,22 @@ func (c *OrderController) Pay(ctx *gin.Context) {
 	}
 
 	res, err := c.OrderUseCase.Pay(ctx, req)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ginutils.ResponseOK(ctx, res)
+}
+
+func (c *OrderController) Cancel(ctx *gin.Context) {
+	req := &dto.CancelOrderRequest{CustomerID: ginutils.GetUserID(ctx), CustomerEmail: ginutils.GetEmail(ctx)}
+	if err := ctx.ShouldBindJSON(req); err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	res, err := c.OrderUseCase.Cancel(ctx, req)
 	if err != nil {
 		ctx.Error(err)
 		return
