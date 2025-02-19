@@ -35,6 +35,10 @@ type OrderItemRequest struct {
 	Quantity  int   `json:"quantity" binding:"required,min=1"`
 }
 
+type GetOrderRequest struct {
+	OrderID int64
+}
+
 func ToOrderResponses(orders []*entity.Order) []*OrderResponse {
 	res := []*OrderResponse{}
 	for _, order := range orders {

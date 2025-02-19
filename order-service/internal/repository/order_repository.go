@@ -12,7 +12,9 @@ import (
 
 type OrderRepository interface {
 	FindByRequestID(ctx context.Context, requestID string) (*entity.Order, error)
+	FindByID(ctx context.Context, id int64) (*entity.Order, error)
 	Save(ctx context.Context, order *entity.Order) error
+	UpdateStatus(ctx context.Context, order *entity.Order) error
 }
 
 type orderRepositoryImpl struct {
@@ -82,6 +84,59 @@ func (r *orderRepositoryImpl) FindByRequestID(ctx context.Context, requestID str
 	return order, nil
 }
 
+func (r *orderRepositoryImpl) FindByID(ctx context.Context, id int64) (*entity.Order, error) {
+	query := `
+		SELECT
+			request_id, customer_id, total_amount, description, status, created_at, updated_at
+		FROM
+			orders
+		WHERE
+			id = $1
+	`
+
+	order := &entity.Order{ID: id}
+	err := r.DB.QueryRowContext(ctx, query, id).Scan(&order.RequestID, &order.CustomerID, &order.TotalAmount, &order.Description,
+		&order.Status, &order.CreatedAt, &order.UpdatedAt)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	query = `
+		SELECT
+			id, product_id, quantity, price
+		FROM
+			order_items
+		WHERE
+			order_id = $1
+	`
+
+	rows, err := r.DB.QueryContext(ctx, query, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	items := []*entity.OrderItem{}
+	for rows.Next() {
+		item := new(entity.OrderItem)
+		if err := rows.Scan(&item.ID, &item.ProductID, &item.Quantity, &item.Price); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+	order.Items = items
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return order, nil
+}
+
 func (r *orderRepositoryImpl) Save(ctx context.Context, order *entity.Order) error {
 	query := `
 		INSERT INTO
@@ -129,4 +184,18 @@ func (r *orderRepositoryImpl) Save(ctx context.Context, order *entity.Order) err
 	}
 
 	return nil
+}
+
+func (r *orderRepositoryImpl) UpdateStatus(ctx context.Context, order *entity.Order) error {
+	query := `
+		UPDATE
+			orders
+		SET
+			status = $1, updated_at = CURRENT_TIMESTAMP
+		WHERE
+			id = $2
+	`
+
+	_, err := r.DB.ExecContext(ctx, query, order.Status, order.ID)
+	return err
 }

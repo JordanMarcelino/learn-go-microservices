@@ -132,7 +132,7 @@ func (c *AutoCancelConsumer) Handler() mq.AMQPHandler {
 				return err
 			}
 
-			return c.CancelNotificationProducer.Send(ctx, &dto.CancelNotificationEvent{OrderID: event.OrderID, Email: event.Email})
+			return c.CancelNotificationProducer.Send(ctx, &dto.CancelNotificationEvent{OrderID: event.OrderID, UserID: event.UserID, Email: event.Email})
 		})
 
 	}

@@ -16,6 +16,7 @@ import (
 )
 
 type OrderUseCase interface {
+	Get(ctx context.Context, req *GetOrderRequest) (*OrderResponse, error)
 	Save(ctx context.Context, req *CreateOrderRequest) (*OrderResponse, error)
 }
 
@@ -41,6 +42,18 @@ func NewOrderUseCase(
 		PaymentReminderProducer: paymentReminderProducer,
 		AutoCancelProducer:      autoCancelProducer,
 	}
+}
+
+func (u *orderUseCaseImpl) Get(ctx context.Context, req *GetOrderRequest) (*OrderResponse, error) {
+	order, err := u.DataStore.OrderRepository().FindByID(ctx, req.OrderID)
+	if err != nil {
+		return nil, err
+	}
+	if order == nil {
+		return nil, httperror.NewOrderNotFoundError()
+	}
+
+	return ToOrderResponse(order), nil
 }
 
 func (u *orderUseCaseImpl) Save(ctx context.Context, req *CreateOrderRequest) (*OrderResponse, error) {
@@ -117,7 +130,7 @@ func (u *orderUseCaseImpl) Save(ctx context.Context, req *CreateOrderRequest) (*
 			return err
 		}
 
-		if err := u.AutoCancelProducer.Send(ctx, &AutoCancelEvent{OrderID: order.ID, Email: req.CustomerEmail}); err != nil {
+		if err := u.AutoCancelProducer.Send(ctx, &AutoCancelEvent{OrderID: order.ID, UserID: req.CustomerID, Email: req.CustomerEmail}); err != nil {
 			return err
 		}
 
