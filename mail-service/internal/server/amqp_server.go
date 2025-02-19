@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/jordanmarcelino/learn-go-microservices/mail-service/internal/config"
 	"github.com/jordanmarcelino/learn-go-microservices/mail-service/internal/log"
 	"github.com/jordanmarcelino/learn-go-microservices/mail-service/internal/provider"
 	"github.com/jordanmarcelino/learn-go-microservices/pkg/mq"
@@ -15,12 +16,12 @@ type AMQPServer struct {
 	consumers []mq.AMQPConsumer
 }
 
-func NewAMQPServer() *AMQPServer {
+func NewAMQPServer(cfg *config.Config) *AMQPServer {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &AMQPServer{
 		ctx:       ctx,
 		cancel:    cancel,
-		consumers: provider.BootstrapAMQP(),
+		consumers: provider.BootstrapAMQP(cfg),
 	}
 }
 

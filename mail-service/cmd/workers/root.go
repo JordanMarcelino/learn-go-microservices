@@ -27,7 +27,7 @@ func Start() {
 			Use:   "serve-all",
 			Short: "Run all",
 			Run: func(cmd *cobra.Command, _ []string) {
-				runAMQPWorker(ctx)
+				runAMQPWorker(cfg, ctx)
 			},
 		},
 	}
