@@ -8,7 +8,9 @@ import (
 	. "github.com/jordanmarcelino/learn-go-microservices/order-service/internal/dto"
 	"github.com/jordanmarcelino/learn-go-microservices/order-service/internal/entity"
 	"github.com/jordanmarcelino/learn-go-microservices/order-service/internal/httperror"
+	. "github.com/jordanmarcelino/learn-go-microservices/pkg/dto"
 	"github.com/jordanmarcelino/learn-go-microservices/pkg/mq"
+	"github.com/jordanmarcelino/learn-go-microservices/pkg/utils/pageutils"
 
 	"github.com/jordanmarcelino/learn-go-microservices/order-service/internal/repository"
 	"github.com/jordanmarcelino/learn-go-microservices/order-service/internal/utils/redisutils"
@@ -16,6 +18,7 @@ import (
 )
 
 type OrderUseCase interface {
+	Search(ctx context.Context, req *SearchOrderRequest) ([]*OrderResponse, *PageMetaData, error)
 	Get(ctx context.Context, req *GetOrderRequest) (*OrderResponse, error)
 	Save(ctx context.Context, req *CreateOrderRequest) (*OrderResponse, error)
 }
@@ -34,7 +37,7 @@ func NewOrderUseCase(
 	orderCreatedProducer mq.KafkaProducer,
 	paymentReminderProducer mq.AMQPProducer,
 	autoCancelProducer mq.AMQPProducer,
-) OrderUseCase {
+) *orderUseCaseImpl {
 	return &orderUseCaseImpl{
 		DataStore:               dataStore,
 		LockRepository:          lockRepository,
@@ -42,6 +45,19 @@ func NewOrderUseCase(
 		PaymentReminderProducer: paymentReminderProducer,
 		AutoCancelProducer:      autoCancelProducer,
 	}
+}
+
+func (u *orderUseCaseImpl) Search(ctx context.Context, req *SearchOrderRequest) ([]*OrderResponse, *PageMetaData, error) {
+	orderRepository := u.DataStore.OrderRepository()
+
+	orders, total, err := orderRepository.Search(ctx, req)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	res := ToOrderResponses(orders)
+	metadata := pageutils.NewMetadata(total, req.Page, req.Limit)
+	return res, metadata, nil
 }
 
 func (u *orderUseCaseImpl) Get(ctx context.Context, req *GetOrderRequest) (*OrderResponse, error) {
