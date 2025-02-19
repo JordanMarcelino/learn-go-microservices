@@ -7,10 +7,13 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/jordanmarcelino/learn-go-microservices/order-service/internal/dto"
 	"github.com/jordanmarcelino/learn-go-microservices/order-service/internal/entity"
+	"github.com/jordanmarcelino/learn-go-microservices/pkg/utils/pageutils"
 )
 
 type OrderRepository interface {
+	Search(ctx context.Context, req *dto.SearchOrderRequest) ([]*entity.Order, int64, error)
 	FindByRequestID(ctx context.Context, requestID string) (*entity.Order, error)
 	FindByID(ctx context.Context, id int64) (*entity.Order, error)
 	Save(ctx context.Context, order *entity.Order) error
@@ -25,6 +28,58 @@ func NewOrderRepository(db DBTX) *orderRepositoryImpl {
 	return &orderRepositoryImpl{
 		DB: db,
 	}
+}
+
+func (r *orderRepositoryImpl) Search(ctx context.Context, req *dto.SearchOrderRequest) ([]*entity.Order, int64, error) {
+	query := `
+		SELECT
+			o.id, o.customer_id, o.total_amount, o.description, o.status, o.created_at, o.updated_at,
+			ot.id, ot.product_id, ot.quantity, ot.price,
+			COUNT(o.id) OVER(PARTITION BY 1)
+		FROM
+			orders o
+		JOIN
+			order_items ot
+		ON
+			o.id = ot.order_id
+		WHERE
+			($1 = '' OR o.status = $1)
+			AND o.created_at BETWEEN $2 AND $3
+		LIMIT $4 OFFSET $5
+	`
+
+	rows, err := r.DB.QueryContext(ctx, query, req.Status, req.StartDate, req.EndDate, req.Limit, pageutils.GetOffset(req.Page, req.Limit))
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	total := int64(0)
+	orderMap := map[int64]*entity.Order{}
+	for rows.Next() {
+		order := new(entity.Order)
+		item := new(entity.OrderItem)
+		if err := rows.Scan(&order.ID, &order.CustomerID, &order.TotalAmount, &order.Description, &order.Status, &order.CreatedAt, &order.UpdatedAt,
+			&item.ID, &item.ProductID, &item.Quantity, &item.Price, &total); err != nil {
+			return nil, 0, err
+		}
+
+		if _, ok := orderMap[order.ID]; !ok {
+			orderMap[order.ID] = order
+		}
+		orderMap[order.ID].Items = append(orderMap[order.ID].Items, item)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, 0, err
+	}
+
+	orders := []*entity.Order{}
+	for _, order := range orderMap {
+		orders = append(orders, order)
+	}
+
+	return orders, total, nil
 }
 
 func (r *orderRepositoryImpl) FindByRequestID(ctx context.Context, requestID string) (*entity.Order, error) {

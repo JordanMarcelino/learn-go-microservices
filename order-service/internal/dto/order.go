@@ -1,6 +1,8 @@
 package dto
 
 import (
+	"time"
+
 	"github.com/jordanmarcelino/learn-go-microservices/order-service/internal/entity"
 	"github.com/shopspring/decimal"
 )
@@ -37,6 +39,14 @@ type OrderItemRequest struct {
 
 type GetOrderRequest struct {
 	OrderID int64
+}
+
+type SearchOrderRequest struct {
+	StartDate time.Time `form:"start-date" time_format:"02-01-2006" binding:"required"`
+	EndDate   time.Time `form:"end-date" time_format:"02-01-2006" binding:"required,gtefield=StartDate"`
+	Status    string    `form:"status" binding:"omitempty,oneof=PENDING SUCCESS CANCELLED"`
+	Limit     int64     `form:"limit" binding:"gte=1,lte=25"`
+	Page      int64     `form:"page" binding:"gte=1"`
 }
 
 func ToOrderResponses(orders []*entity.Order) []*OrderResponse {
