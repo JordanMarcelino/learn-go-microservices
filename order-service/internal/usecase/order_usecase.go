@@ -21,6 +21,7 @@ type OrderUseCase interface {
 	Search(ctx context.Context, req *SearchOrderRequest) ([]*OrderResponse, *PageMetaData, error)
 	Get(ctx context.Context, req *GetOrderRequest) (*OrderResponse, error)
 	Save(ctx context.Context, req *CreateOrderRequest) (*OrderResponse, error)
+	Pay(ctx context.Context, req *PayOrderRequest) (*PaymentResponse, error)
 }
 
 type orderUseCaseImpl struct {
@@ -29,6 +30,7 @@ type orderUseCaseImpl struct {
 	OrderCreatedProducer    mq.KafkaProducer
 	PaymentReminderProducer mq.AMQPProducer
 	AutoCancelProducer      mq.AMQPProducer
+	OrderSuccessProducer    mq.AMQPProducer
 }
 
 func NewOrderUseCase(
@@ -37,6 +39,7 @@ func NewOrderUseCase(
 	orderCreatedProducer mq.KafkaProducer,
 	paymentReminderProducer mq.AMQPProducer,
 	autoCancelProducer mq.AMQPProducer,
+	orderSuccessProducer mq.AMQPProducer,
 ) *orderUseCaseImpl {
 	return &orderUseCaseImpl{
 		DataStore:               dataStore,
@@ -44,6 +47,7 @@ func NewOrderUseCase(
 		OrderCreatedProducer:    orderCreatedProducer,
 		PaymentReminderProducer: paymentReminderProducer,
 		AutoCancelProducer:      autoCancelProducer,
+		OrderSuccessProducer:    orderSuccessProducer,
 	}
 }
 
@@ -151,6 +155,61 @@ func (u *orderUseCaseImpl) Save(ctx context.Context, req *CreateOrderRequest) (*
 		}
 
 		res = ToOrderResponse(order)
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (u *orderUseCaseImpl) Pay(ctx context.Context, req *PayOrderRequest) (*PaymentResponse, error) {
+	lockKey := redisutils.NewLockKey(req.RequestID, req.CustomerID)
+	ttl := constant.CreateOrderTTL
+	opt := &redislock.Options{
+		RetryStrategy: redislock.LimitRetry(redislock.LinearBackoff(constant.CreateOrderRetryInterval), constant.CreateOrderRetryLimit),
+	}
+
+	lock, err := u.LockRepository.Get(ctx, lockKey, ttl, opt)
+	if err != nil {
+		return nil, err
+	}
+	defer lock.Release(ctx)
+
+	res := new(PaymentResponse)
+	err = u.DataStore.Atomic(ctx, func(ds repository.DataStore) error {
+		orderRepository := ds.OrderRepository()
+
+		order, err := orderRepository.FindByID(ctx, req.OrderID)
+		if err != nil {
+			return err
+		}
+		if order == nil {
+			return httperror.NewOrderNotFoundError()
+		}
+		if order.CustomerID != req.CustomerID {
+			return httperror.NewOrderNotFoundError()
+		}
+
+		if order.Status == constant.ORDER_SUCCESS {
+			return httperror.NewOrderAlreadyPaidError()
+		}
+		if order.Status == constant.ORDER_CANCELLED {
+			return httperror.NewOrderAlreadyCancelledError()
+		}
+
+		order.Status = constant.ORDER_SUCCESS
+		if err := orderRepository.UpdateStatus(ctx, order); err != nil {
+			return err
+		}
+
+		if err := u.OrderSuccessProducer.Send(ctx, &OrderSuccessEvent{OrderID: order.ID, UserID: req.CustomerID, Email: req.CustomerEmail}); err != nil {
+			return err
+		}
+
+		res = ToPaymentResponse(order)
 		return nil
 	})
 
