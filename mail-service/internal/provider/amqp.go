@@ -13,6 +13,7 @@ func BootstrapAMQP(cfg *config.Config) []pmq.AMQPConsumer {
 	return []pmq.AMQPConsumer{
 		mq.NewSendVerificationConsumer(rabbitmq, mailer),
 		mq.NewAccountVerifiedConsumer(rabbitmq, mailer),
+		mq.NewPaymentReminderConsumer(rabbitmq, mailer, orderClient),
 		mq.NewOrderCancelConsumer(rabbitmq, mailer, orderClient),
 		mq.NewOrderSuccessConsumer(rabbitmq, mailer, orderClient),
 	}
