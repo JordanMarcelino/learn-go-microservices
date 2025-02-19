@@ -10,6 +10,7 @@ import (
 
 type Config struct {
 	Amqp   *AMQPConfig
+	Feign  *FeignConfig
 	SMTP   *SMTPConfig
 	Logger *LoggerConfig
 }
@@ -26,6 +27,7 @@ func InitConfig() *Config {
 
 	return &Config{
 		Amqp:   initAmqpConfig(),
+		Feign:  initFeignConfig(),
 		SMTP:   initSMTPConfig(),
 		Logger: initLoggerConfig(),
 	}
