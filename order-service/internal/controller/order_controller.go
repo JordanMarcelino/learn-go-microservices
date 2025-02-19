@@ -29,6 +29,8 @@ func (c *OrderController) Route(r *gin.Engine) {
 		g.GET("", c.Search)
 		g.POST("", c.Create)
 		g.GET("/:orderId", c.Get)
+
+		g.POST("/pay", c.Pay)
 	}
 
 }
@@ -84,4 +86,20 @@ func (c *OrderController) Create(ctx *gin.Context) {
 	}
 
 	ginutils.ResponseCreated(ctx, res)
+}
+
+func (c *OrderController) Pay(ctx *gin.Context) {
+	req := &dto.PayOrderRequest{CustomerID: ginutils.GetUserID(ctx), CustomerEmail: ginutils.GetEmail(ctx)}
+	if err := ctx.ShouldBindJSON(req); err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	res, err := c.OrderUseCase.Pay(ctx, req)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ginutils.ResponseOK(ctx, res)
 }
