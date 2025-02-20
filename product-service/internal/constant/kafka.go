@@ -15,6 +15,19 @@ const (
 )
 
 const (
-	KafkaRetryDelay = 3
-	KafkaRetryLimit = 3
+	OrderCreatedTopic   = "order-created"
+	OrderCancelledTopic = "order-cancelled"
+)
+
+const (
+	OrderCreatedConsumerGroup   = "order-created-consumer-group"
+	OrderCancelledConsumerGroup = "order-cancelled-consumer-group"
+)
+
+const (
+	KafkaProducerRetryDelay = 3
+	KafkaProducerRetryLimit = 3
+
+	KafkaConsumerRetryDelay = 2
+	KafkaConsumerRetryLimit = 3
 )

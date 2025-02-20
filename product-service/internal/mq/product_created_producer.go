@@ -63,8 +63,8 @@ func (p *ProductCreatedProducer) Retry() {
 		metadata := new(mq.KafkaMetadata)
 		p.UnmarshalMetadata(msg, metadata)
 
-		if metadata.Retry > constant.KafkaRetryLimit {
-			log.Logger.Errorf("failed to send message after %d retries [partition-%v]-[offset-%v] %v", constant.KafkaRetryLimit, msg.Partition, msg.Offset, msg.Value)
+		if metadata.Retry > constant.KafkaProducerRetryLimit {
+			log.Logger.Errorf("failed to send message after %d retries [partition-%v]-[offset-%v] %v", constant.KafkaProducerRetryLimit, msg.Partition, msg.Offset, msg.Value)
 			return
 		}
 
@@ -72,7 +72,7 @@ func (p *ProductCreatedProducer) Retry() {
 		metaBytes, _ := sonic.Marshal(metadata)
 		msg.Metadata = metaBytes
 
-		backoff := time.Duration(math.Pow(constant.KafkaRetryDelay, float64(metadata.Retry))) * time.Second
+		backoff := time.Duration(math.Pow(constant.KafkaProducerRetryDelay, float64(metadata.Retry))) * time.Second
 		time.Sleep(backoff)
 
 		select {
