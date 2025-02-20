@@ -5,7 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jordanmarcelino/learn-go-microservices/order-service/internal/dto"
-	"github.com/jordanmarcelino/learn-go-microservices/order-service/internal/log"
 	"github.com/jordanmarcelino/learn-go-microservices/order-service/internal/middleware"
 	"github.com/jordanmarcelino/learn-go-microservices/order-service/internal/usecase"
 	"github.com/jordanmarcelino/learn-go-microservices/pkg/httperror"
@@ -39,11 +38,9 @@ func (c *OrderController) Route(r *gin.Engine) {
 func (c *OrderController) Search(ctx *gin.Context) {
 	req := new(dto.SearchOrderRequest)
 	if err := ctx.ShouldBindQuery(req); err != nil {
-		log.Logger.Infof("req: %+v", req)
 		ctx.Error(err)
 		return
 	}
-	log.Logger.Infof("req: %+v", req)
 
 	res, paging, err := c.OrderUseCase.Search(ctx, req)
 	if err != nil {
