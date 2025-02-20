@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/jordanmarcelino/learn-go-microservices/pkg/utils/pageutils"
 	"github.com/jordanmarcelino/learn-go-microservices/product-service/internal/dto"
@@ -13,9 +14,11 @@ import (
 
 type ProductRepository interface {
 	Search(ctx context.Context, req *dto.SearchProductRequest) ([]*entity.Product, int64, error)
+	FindAllByIDForUpdate(ctx context.Context, ids []int64) ([]*entity.Product, error)
 	FindByID(ctx context.Context, id int64) (*entity.Product, error)
 	Save(ctx context.Context, product *entity.Product) error
 	Update(ctx context.Context, product *entity.Product) error
+	UpdateAllQuantity(ctx context.Context, products []*entity.Product) error
 	DeleteByID(ctx context.Context, id int64) error
 }
 
@@ -67,6 +70,40 @@ func (r *productRepository) Search(ctx context.Context, req *dto.SearchProductRe
 	return products, total, nil
 }
 
+func (r *productRepository) FindAllByIDForUpdate(ctx context.Context, ids []int64) ([]*entity.Product, error) {
+	query := `
+		SELECT
+			id, name, description, price, quantity, created_at, updated_at
+		FROM
+			products
+		WHERE
+			id = ANY($1)
+		FOR UPDATE
+	`
+
+	rows, err := r.DB.QueryContext(ctx, query, ids)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	products := []*entity.Product{}
+	for rows.Next() {
+		product := new(entity.Product)
+		if err := rows.Scan(&product.ID, &product.Name, &product.Description, &product.Price,
+			&product.Quantity, &product.CreatedAt, &product.UpdatedAt); err != nil {
+			return nil, err
+		}
+		products = append(products, product)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return products, nil
+}
+
 func (r *productRepository) FindByID(ctx context.Context, id int64) (*entity.Product, error) {
 	query := `
 		SELECT
@@ -116,6 +153,31 @@ func (r *productRepository) Update(ctx context.Context, product *entity.Product)
 	`
 
 	return r.DB.QueryRowContext(ctx, query, product.Name, product.Description, product.Price, product.Quantity, product.ID).Scan(&product.CreatedAt, &product.UpdatedAt)
+}
+
+func (r *productRepository) UpdateAllQuantity(ctx context.Context, products []*entity.Product) error {
+	query := `
+		INSERT INTO
+			products (id, name, description, price, quantity)
+		VALUES
+			%s
+		ON CONFLICT (id) DO UPDATE
+		SET
+			quantity = EXCLUDED.quantity,
+			updated_at = CURRENT_TIMESTAMP
+	`
+
+	params := []string{}
+	args := []any{}
+	for i, product := range products {
+		params = append(params, fmt.Sprintf("($%d, $%d, $%d, $%d, $%d)", i*5+1, i*5+2, i*5+3, i*5+4, i*5+5))
+		args = append(args, product.ID, product.Name, product.Description, product.Price, product.Quantity)
+	}
+
+	query = fmt.Sprintf(query, strings.Join(params, ","))
+	_, err := r.DB.ExecContext(ctx, query, args...)
+
+	return err
 }
 
 func (r *productRepository) DeleteByID(ctx context.Context, id int64) error {
