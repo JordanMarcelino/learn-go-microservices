@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"time"
 
 	"github.com/bsm/redislock"
 	"github.com/jordanmarcelino/learn-go-microservices/order-service/internal/constant"
@@ -153,7 +154,10 @@ func (u *orderUseCaseImpl) Save(ctx context.Context, req *CreateOrderRequest) (*
 			return err
 		}
 
-		if err := u.PaymentReminderProducer.Send(ctx, &PaymentReminderEvent{OrderID: order.ID, Email: req.CustomerEmail}); err != nil {
+		if err := u.PaymentReminderProducer.Send(ctx,
+			&PaymentReminderEvent{OrderID: order.ID, UserID: req.CustomerID, Email: req.CustomerEmail,
+				DueDate: time.Now().Add(24 * time.Hour).Format("2006-01-02 15:04:05")},
+		); err != nil {
 			return err
 		}
 
