@@ -29,15 +29,15 @@ type productUseCase struct {
 
 func NewProductUseCase(
 	dataStore repository.DataStore,
-	ProductCreatedProducer mq.KafkaProducer,
-	ProductUpdatedProducer mq.KafkaProducer,
-	ProductDeletedProducer mq.KafkaProducer,
+	productCreatedProducer mq.KafkaProducer,
+	productUpdatedProducer mq.KafkaProducer,
+	productDeletedProducer mq.KafkaProducer,
 ) ProductUseCase {
 	return &productUseCase{
 		DataStore:              dataStore,
-		ProductCreatedProducer: ProductCreatedProducer,
-		ProductUpdatedProducer: ProductUpdatedProducer,
-		ProductDeletedProducer: ProductDeletedProducer,
+		ProductCreatedProducer: productCreatedProducer,
+		ProductUpdatedProducer: productUpdatedProducer,
+		ProductDeletedProducer: productDeletedProducer,
 	}
 }
 
