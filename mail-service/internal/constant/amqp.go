@@ -9,7 +9,7 @@ const (
 	AccountVerifiedKey      = "account.verified"
 	AccountVerifiedQueue    = "verified"
 
-	PaymentReminderExchange = "notifications"
+	PaymentReminderExchange = "payments"
 	PaymentReminderKey      = "send.payment.reminder"
 	PaymentReminderQueue    = "reminder"
 
