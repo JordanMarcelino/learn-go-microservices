@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 
 	"github.com/jordanmarcelino/learn-go-microservices/order-service/internal/config"
@@ -21,17 +22,23 @@ func Start() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
+	var wg sync.WaitGroup
+	wg.Add(1)
+
 	rootCmd := &cobra.Command{}
 	cmd := []*cobra.Command{
 		{
 			Use:   "serve-all",
 			Short: "Run all",
 			Run: func(cmd *cobra.Command, _ []string) {
-				runHttpWorker(cfg, ctx)
+				runHttpWorker(cfg, ctx, &wg)
 			},
 			PreRun: func(cmd *cobra.Command, args []string) {
-				go runKafkaWorker(cfg, ctx)
-				go runAMQPWorker(cfg, ctx)
+				go func() {
+					wg.Wait()
+					go runKafkaWorker(cfg, ctx)
+					go runAMQPWorker(cfg, ctx)
+				}()
 			},
 		},
 	}
