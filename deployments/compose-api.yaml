@@ -1,0 +1,69 @@
+services:
+  mailhog:
+    image: "mailhog/mailhog:latest"
+    restart: always
+    container_name: mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - production
+
+  auth-service:
+    build:
+      context: ./../auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    restart: always
+    networks:
+      - production
+
+  product-service:
+    build:
+      context: ./../product-service
+      dockerfile: Dockerfile
+    container_name: product-service
+    restart: always
+    networks:
+      - production
+
+  order-service:
+    build:
+      context: ./../order-service
+      dockerfile: Dockerfile
+    container_name: order-service
+    restart: always
+    networks:
+      - production
+
+  mail-service:
+    build:
+      context: ./../mail-service
+      dockerfile: Dockerfile
+    container_name: mail-service
+    restart: always
+    depends_on:
+      - mailhog
+    networks:
+      - production
+
+  api-gateway:
+    build:
+      context: ./../gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      - auth-service
+      - product-service
+      - order-service
+      - mail-service
+    networks:
+      - production
+
+networks:
+  production:
+    name: production
+    external: true

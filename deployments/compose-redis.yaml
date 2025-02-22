@@ -5,9 +5,11 @@ services:
     container_name: redis-1
     environment: &redis-env
       REDIS_PASSWORD: a45e0a886d9b88f9ede74def
-      REDIS_NODES: redis-1 redis-2 redis-3 redis-cluster
+      REDIS_NODES: redis-1 redis-2 redis-3 redis-4 redis-5 redis-cluster
     volumes:
       - redis-1_data:/bitnami/redis/data
+    networks:
+      - production
 
   redis-2:
     <<: *redis-common
@@ -25,6 +27,22 @@ services:
     volumes:
       - redis-3_data:/bitnami/redis/data
 
+  redis-4:
+    <<: *redis-common
+    container_name: redis-4
+    environment:
+      <<: *redis-env
+    volumes:
+      - redis-4_data:/bitnami/redis/data
+
+  redis-5:
+    <<: *redis-common
+    container_name: redis-5
+    environment:
+      <<: *redis-env
+    volumes:
+      - redis-5_data:/bitnami/redis/data
+
   redis-cluster:
     <<: *redis-common
     container_name: redis-cluster
@@ -39,9 +57,18 @@ services:
       - redis-1
       - redis-2
       - redis-3
+      - redis-4
+      - redis-5
 
 volumes:
   redis-1_data:
   redis-2_data:
   redis-3_data:
+  redis-4_data:
+  redis-5_data:
   redis-cluster:
+
+networks:
+  production:
+    name: production
+    external: true

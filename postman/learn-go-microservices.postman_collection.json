@@ -1,0 +1,2341 @@
+{
+	"info": {
+		"_postman_id": "658af86e-d98e-4f37-b7f6-8bb186b30bee",
+		"name": "learn-go-microservices",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19847270"
+	},
+	"item": [
+		{
+			"name": "Gateway",
+			"item": [
+				{
+					"name": "Auth",
+					"item": [
+						{
+							"name": "Register",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"user@gmail.com\",\n    \"password\": \"secret123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{GATEWAY_URL}}/auth/register",
+									"host": [
+										"{{GATEWAY_URL}}"
+									],
+									"path": [
+										"auth",
+										"register"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\": \"user@gmail.com\",\n    \"password\": \"secret123\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{AUTH_URL}}/register",
+											"host": [
+												"{{AUTH_URL}}"
+											],
+											"path": [
+												"register"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 31 Jan 2025 16:36:17 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "168"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"success\",\n    \"data\": {\n        \"id\": 1,\n        \"email\": \"user@gmail.com\",\n        \"is_verified\": false,\n        \"created_at\": \"2025-01-31T23:36:17.241022Z\",\n        \"updated_at\": \"2025-01-31T23:36:17.241022Z\"\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Login",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"user@gmail.com\",\n    \"password\": \"secret123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{GATEWAY_URL}}/auth/login",
+									"host": [
+										"{{GATEWAY_URL}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "User not verified",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\": \"user@gmail.com\",\n    \"password\": \"secret123\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{AUTH_URL}}/login",
+											"host": [
+												"{{AUTH_URL}}"
+											],
+											"path": [
+												"login"
+											]
+										}
+									},
+									"status": "Unauthorized",
+									"code": 401,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Sun, 02 Feb 2025 17:39:10 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "31"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"user not verified\"\n}"
+								},
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\": \"user@gmail.com\",\n    \"password\": \"secret123\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{AUTH_URL}}/login",
+											"host": [
+												"{{AUTH_URL}}"
+											],
+											"path": [
+												"login"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 03 Feb 2025 08:35:52 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "280"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"success\",\n    \"data\": {\n        \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhdXRoLXNlcnZpY2UiLCJleHAiOjE3Mzg2NTgxNTIsImlhdCI6MTczODU3MTc1MiwianRpIjoiMWY1ZTU3NTgtYzE1Mi00MDcxLWI3MTItYzQxZjgwMzA2YTY0IiwidXNlcl9pZCI6MX0.AWOWZc9JaZNFLJmf3pW_6h8d8DAUM4UrzZVgM0aWokg\"\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Verify",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"user@gmail.com\",\n    \"verification_token\": \"872231\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{GATEWAY_URL}}/auth/verify",
+									"host": [
+										"{{GATEWAY_URL}}"
+									],
+									"path": [
+										"auth",
+										"verify"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Token expired",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\": \"user@gmail.com\",\n    \"verification_token\": \"secret123\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{AUTH_URL}}/verify",
+											"host": [
+												"{{AUTH_URL}}"
+											],
+											"path": [
+												"verify"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 03 Feb 2025 08:41:13 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "27"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"token expired\"\n}"
+								},
+								{
+									"name": "User not found",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\": \"use@gmail.com\",\n    \"verification_token\": \"secret123\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{AUTH_URL}}/verify",
+											"host": [
+												"{{AUTH_URL}}"
+											],
+											"path": [
+												"verify"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 03 Feb 2025 08:41:25 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "28"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"user not found\"\n}"
+								},
+								{
+									"name": "Wrong token",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\": \"user@gmail.com\",\n    \"verification_token\": \"secret123\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{AUTH_URL}}/verify",
+											"host": [
+												"{{AUTH_URL}}"
+											],
+											"path": [
+												"verify"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 03 Feb 2025 08:42:02 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "28"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"token is wrong\"\n}"
+								},
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\": \"user@gmail.com\",\n    \"verification_token\": \"112306\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{AUTH_URL}}/verify",
+											"host": [
+												"{{AUTH_URL}}"
+											],
+											"path": [
+												"verify"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 03 Feb 2025 08:44:29 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "81"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"success\",\n    \"data\": {\n        \"id\": 4,\n        \"email\": \"user@gmail.com\",\n        \"is_verified\": true\n    }\n}"
+								},
+								{
+									"name": "Already verified",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\": \"user@gmail.com\",\n    \"verification_token\": \"112306\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{AUTH_URL}}/verify",
+											"host": [
+												"{{AUTH_URL}}"
+											],
+											"path": [
+												"verify"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 03 Feb 2025 08:46:12 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "35"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"user already verified\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Resend Verification",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{GATEWAY_URL}}/auth/resend-verification",
+									"host": [
+										"{{GATEWAY_URL}}"
+									],
+									"path": [
+										"auth",
+										"resend-verification"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\": \"userz@gmail.com\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{AUTH_URL}}/resend-verification",
+											"host": [
+												"{{AUTH_URL}}"
+											],
+											"path": [
+												"resend-verification"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 03 Feb 2025 15:04:22 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "21"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"success\"\n}"
+								},
+								{
+									"name": "Token already exist",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\": \"userz@gmail.com\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{AUTH_URL}}/resend-verification",
+											"host": [
+												"{{AUTH_URL}}"
+											],
+											"path": [
+												"resend-verification"
+											]
+										}
+									},
+									"status": "Too Many Requests",
+									"code": 429,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 03 Feb 2025 15:04:27 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "76"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"token was recently sent, please wait before requesting another\"\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Product",
+					"item": [
+						{
+							"name": "Update",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Susu Dancow\",\n    \"description\": \"Susu sapi 100% murni dengan berbagai rasa\",\n    \"price\": 25000,\n    \"quantity\": 5\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{GATEWAY_URL}}/products/5",
+									"host": [
+										"{{GATEWAY_URL}}"
+									],
+									"path": [
+										"products",
+										"5"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"Susu Dancow\",\n    \"description\": \"Susu sapi 100% murni dengan berbagai rasa\",\n    \"price\": 25000,\n    \"quantity\": 10\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{GATEWAY_URL}}/products/5",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"products",
+												"5"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 10 Feb 2025 15:24:43 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "203"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"success\",\n    \"data\": {\n        \"id\": 5,\n        \"name\": \"Susu Dancow\",\n        \"description\": \"Susu sapi 100% murni dengan berbagai rasa\",\n        \"price\": \"25000\",\n        \"quantity\": 10,\n        \"created_at\": \"2025-02-10 22:12:44.9546 +0000 UTC\",\n        \"updated_at\": \"2025-02-10 22:24:43.040231 +0000 UTC\"\n    }\n}"
+								},
+								{
+									"name": "Product not found",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"Susu Dancow\",\n    \"description\": \"Susu sapi 100% murni dengan berbagai rasa\",\n    \"price\": 25000,\n    \"quantity\": 10\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{GATEWAY_URL}}/products/1",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"products",
+												"1"
+											]
+										}
+									},
+									"status": "Not Found",
+									"code": 404,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 10 Feb 2025 15:25:21 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "59"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"product not found\"\n}"
+								},
+								{
+									"name": "Invalid Id",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"Susu Dancow\",\n    \"description\": \"Susu sapi 100% murni dengan berbagai rasa\",\n    \"price\": 25000,\n    \"quantity\": 10\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{GATEWAY_URL}}/products/aa",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"products",
+												"aa"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 10 Feb 2025 15:25:33 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "79"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"expected a numeric value but got 'aa'\"\n}"
+								},
+								{
+									"name": "Bad request",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{GATEWAY_URL}}/products/5",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"products",
+												"5"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 10 Feb 2025 15:25:52 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "155"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"input validation error\",\n    \"errors\": [\n        {\n            \"field\": \"name\",\n            \"message\": \"name is required\"\n        },\n        {\n            \"field\": \"description\",\n            \"message\": \"description is required\"\n        },\n        {\n            \"field\": \"price\",\n            \"message\": \"price must be greater than to 0\"\n        },\n        {\n            \"field\": \"quantity\",\n            \"message\": \"quantity is required\"\n        }\n    ]\n}"
+								}
+							]
+						},
+						{
+							"name": "Create",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Susu Dancow\",\n    \"description\": \"Susu sapi 100% murni dengan berbagai rasa\",\n    \"price\": 25000,\n    \"quantity\": 10\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{GATEWAY_URL}}/products",
+									"host": [
+										"{{GATEWAY_URL}}"
+									],
+									"path": [
+										"products"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"Susu Dancow\",\n    \"description\": \"Susu sapi 100% murni dengan berbagai rasa\",\n    \"price\": 25000,\n    \"quantity\": 10\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{GATEWAY_URL}}/products",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"products"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 07 Feb 2025 15:39:21 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "189"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"success\",\n    \"data\": {\n        \"id\": 1,\n        \"name\": \"Susu Dancow\",\n        \"description\": \"Susu sapi 100% murni dengan berbagai rasa\",\n        \"price\": \"25000\",\n        \"quantity\": 10,\n        \"created_at\": \"2025-02-07 22:39:21.482395 +0000 UTC\",\n        \"updated_at\": \"2025-02-07 22:39:21.482395 +0000 UTC\"\n    }\n}"
+								},
+								{
+									"name": "Bad request",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    // \"name\": \"Susu Dancow\",\n    // \"description\": \"Susu sapi 100% murni dengan berbagai rasa\",\n    // \"price\": 25000,\n    // \"quantity\": 10\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{GATEWAY_URL}}/products",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"products"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 07 Feb 2025 15:42:22 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "155"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"input validation error\",\n    \"errors\": [\n        {\n            \"field\": \"name\",\n            \"message\": \"name is required\"\n        },\n        {\n            \"field\": \"description\",\n            \"message\": \"description is required\"\n        },\n        {\n            \"field\": \"price\",\n            \"message\": \"price must be greater than to 0\"\n        },\n        {\n            \"field\": \"quantity\",\n            \"message\": \"quantity is required\"\n        }\n    ]\n}"
+								}
+							]
+						},
+						{
+							"name": "Search",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{GATEWAY_URL}}/products?limit=10&page=1&name=ow&description=rni",
+									"host": [
+										"{{GATEWAY_URL}}"
+									],
+									"path": [
+										"products"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "10"
+										},
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "name",
+											"value": "ow"
+										},
+										{
+											"key": "description",
+											"value": "rni"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{GATEWAY_URL}}/products?limit=10&page=1&name=ow&description=rni",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"products"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "10"
+												},
+												{
+													"key": "page",
+													"value": "1"
+												},
+												{
+													"key": "name",
+													"value": "ow"
+												},
+												{
+													"key": "description",
+													"value": "rni"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Sat, 08 Feb 2025 19:03:47 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "359"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"name\": \"Susu Dancow\",\n            \"description\": \"Susu sapi 100% murni dengan berbagai rasa\",\n            \"price\": \"25000\",\n            \"quantity\": 10,\n            \"created_at\": \"2025-02-07 22:39:21.482395 +0000 UTC\",\n            \"updated_at\": \"2025-02-07 22:39:21.482395 +0000 UTC\"\n        },\n        {\n            \"id\": 2,\n            \"name\": \"Susu Dancow\",\n            \"description\": \"Susu sapi 100% murni dengan berbagai rasa\",\n            \"price\": \"25000\",\n            \"quantity\": 10,\n            \"created_at\": \"2025-02-07 22:42:07.550098 +0000 UTC\",\n            \"updated_at\": \"2025-02-07 22:42:07.550098 +0000 UTC\"\n        },\n        {\n            \"id\": 3,\n            \"name\": \"Susu Dancow\",\n            \"description\": \"Susu sapi 100% murni dengan berbagai rasa\",\n            \"price\": \"25000\",\n            \"quantity\": 10,\n            \"created_at\": \"2025-02-08 01:19:22.860228 +0000 UTC\",\n            \"updated_at\": \"2025-02-08 01:19:22.860228 +0000 UTC\"\n        }\n    ],\n    \"paging\": {\n        \"page\": 1,\n        \"size\": 10,\n        \"total_item\": 3,\n        \"total_page\": 1,\n        \"links\": {\n            \"self\": \"http://localhost:8000/?description=rni&limit=10&name=ow&page=1\",\n            \"first\": \"http://localhost:8000/?description=rni&limit=10&name=ow&page=1\",\n            \"prev\": \"http://localhost:8000/?description=rni&limit=10&name=ow&page=1\",\n            \"next\": \"http://localhost:8000/?description=rni&limit=10&name=ow&page=1\",\n            \"last\": \"http://localhost:8000/?description=rni&limit=10&name=ow&page=1\"\n        }\n    }\n}"
+								},
+								{
+									"name": "Bad request",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{GATEWAY_URL}}/products?limit=10&page=1&name=ow&description=rni",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"products"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "10"
+												},
+												{
+													"key": "page",
+													"value": "1"
+												},
+												{
+													"key": "name",
+													"value": "ow"
+												},
+												{
+													"key": "description",
+													"value": "rni"
+												}
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Sat, 08 Feb 2025 19:03:58 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "132"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"input validation error\",\n    \"errors\": [\n        {\n            \"field\": \"limit\",\n            \"message\": \"limit must be greater than or equal to 1\"\n        },\n        {\n            \"field\": \"page\",\n            \"message\": \"page must be greater than or equal to 1\"\n        }\n    ]\n}"
+								}
+							]
+						},
+						{
+							"name": "Get",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{GATEWAY_URL}}/products/1",
+									"host": [
+										"{{GATEWAY_URL}}"
+									],
+									"path": [
+										"products",
+										"1"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{GATEWAY_URL}}/products/1",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"products",
+												"1"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 10 Feb 2025 09:16:03 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "189"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"success\",\n    \"data\": {\n        \"id\": 1,\n        \"name\": \"Susu Dancow\",\n        \"description\": \"Susu sapi 100% murni dengan berbagai rasa\",\n        \"price\": \"25000\",\n        \"quantity\": 10,\n        \"created_at\": \"2025-02-07 22:39:21.482395 +0000 UTC\",\n        \"updated_at\": \"2025-02-07 22:39:21.482395 +0000 UTC\"\n    }\n}"
+								},
+								{
+									"name": "Product not found",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{GATEWAY_URL}}/products/100",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"products",
+												"100"
+											]
+										}
+									},
+									"status": "Not Found",
+									"code": 404,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 10 Feb 2025 09:16:39 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "59"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"product not found\"\n}"
+								},
+								{
+									"name": "Invalid Id",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{GATEWAY_URL}}/products/aa",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"products",
+												"aa"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 10 Feb 2025 09:22:15 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "79"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"expected a numeric value but got 'aa'\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{GATEWAY_URL}}/products/1",
+									"host": [
+										"{{GATEWAY_URL}}"
+									],
+									"path": [
+										"products",
+										"1"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Product not found",
+									"originalRequest": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{GATEWAY_URL}}/products/10",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"products",
+												"10"
+											]
+										}
+									},
+									"status": "Not Found",
+									"code": 404,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 10 Feb 2025 14:57:50 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "59"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"product not found\"\n}"
+								},
+								{
+									"name": "Invalid id",
+									"originalRequest": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{GATEWAY_URL}}/products/aa",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"products",
+												"aa"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 10 Feb 2025 14:57:59 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "79"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"expected a numeric value but got 'aa'\"\n}"
+								},
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{GATEWAY_URL}}/products/1",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"products",
+												"1"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 10 Feb 2025 14:58:12 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "49"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"success\"\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Order",
+					"item": [
+						{
+							"name": "Create",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"request_id\": \"R00001\",\n    \"description\": \"Belanja emak\",\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"quantity\": 1\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{GATEWAY_URL}}/orders",
+									"host": [
+										"{{GATEWAY_URL}}"
+									],
+									"path": [
+										"orders"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"request_id\": \"R00005\",\n    \"items\": [\n        {\n            \"product_id\": 9,\n            \"quantity\": 1\n        }\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{GATEWAY_URL}}/orders",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"orders"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Thu, 13 Feb 2025 17:20:52 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "198"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"success\",\n    \"data\": {\n        \"id\": 5,\n        \"total_amount\": \"25000\",\n        \"description\": \"\",\n        \"status\": \"PENDING\",\n        \"items\": [\n            {\n                \"id\": 5,\n                \"product_id\": 9,\n                \"quantity\": 1,\n                \"price\": \"25000\"\n            }\n        ],\n        \"created_at\": \"2025-02-14 00:20:52.330806 +0000 UTC\",\n        \"updated_at\": \"2025-02-14 00:20:52.330806 +0000 UTC\"\n    }\n}"
+								},
+								{
+									"name": "Bad request",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"request_id\": \"\",\n    \"items\": [\n        {\n        }\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{GATEWAY_URL}}/orders",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"orders"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Thu, 13 Feb 2025 17:21:56 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "131"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"input validation error\",\n    \"errors\": [\n        {\n            \"field\": \"request_id\",\n            \"message\": \"request_id is required\"\n        },\n        {\n            \"field\": \"product_id\",\n            \"message\": \"product_id is required\"\n        },\n        {\n            \"field\": \"quantity\",\n            \"message\": \"quantity is required\"\n        }\n    ]\n}"
+								}
+							]
+						},
+						{
+							"name": "Get",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{GATEWAY_URL}}/orders/11",
+									"host": [
+										"{{GATEWAY_URL}}"
+									],
+									"path": [
+										"orders",
+										"11"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{GATEWAY_URL}}/orders/11",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"orders",
+												"11"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 17 Feb 2025 16:43:16 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "220"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"success\",\n    \"data\": {\n        \"id\": 11,\n        \"total_amount\": \"25000\",\n        \"description\": \"Belanja emak\",\n        \"status\": \"CANCELLED\",\n        \"items\": [\n            {\n                \"id\": 11,\n                \"product_id\": 10,\n                \"quantity\": 1,\n                \"price\": \"25000\"\n            }\n        ],\n        \"created_at\": \"2025-02-17 23:36:05.778725 +0000 UTC\",\n        \"updated_at\": \"2025-02-17 23:36:05.810518 +0000 UTC\"\n    }\n}"
+								},
+								{
+									"name": "Not found",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{GATEWAY_URL}}/orders/12",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"orders",
+												"12"
+											]
+										}
+									},
+									"status": "Not Found",
+									"code": 404,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 19 Feb 2025 06:40:27 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "57"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"order not found\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Search",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{GATEWAY_URL}}/orders?limit=10&page=1&start-date=01-02-2025&end-date=01-03-2025",
+									"host": [
+										"{{GATEWAY_URL}}"
+									],
+									"path": [
+										"orders"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "10"
+										},
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "status",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "start-date",
+											"value": "01-02-2025"
+										},
+										{
+											"key": "end-date",
+											"value": "01-03-2025"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{GATEWAY_URL}}/orders?limit=10&page=1&start-date=01-02-2025&end-date=01-03-2025",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"orders"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "10"
+												},
+												{
+													"key": "page",
+													"value": "1"
+												},
+												{
+													"key": "status",
+													"value": "",
+													"disabled": true
+												},
+												{
+													"key": "start-date",
+													"value": "01-02-2025"
+												},
+												{
+													"key": "end-date",
+													"value": "01-03-2025"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 19 Feb 2025 07:24:58 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"success\",\n    \"data\": [\n        {\n            \"id\": 4,\n            \"total_amount\": \"0\",\n            \"description\": \"\",\n            \"status\": \"PENDING\",\n            \"items\": [\n                {\n                    \"id\": 4,\n                    \"product_id\": 9,\n                    \"quantity\": 1,\n                    \"price\": \"25000\"\n                }\n            ],\n            \"created_at\": \"2025-02-14 00:12:03.17479 +0000 UTC\",\n            \"updated_at\": \"2025-02-14 00:12:03.17479 +0000 UTC\"\n        },\n        {\n            \"id\": 5,\n            \"total_amount\": \"25000\",\n            \"description\": \"\",\n            \"status\": \"PENDING\",\n            \"items\": [\n                {\n                    \"id\": 5,\n                    \"product_id\": 9,\n                    \"quantity\": 1,\n                    \"price\": \"25000\"\n                }\n            ],\n            \"created_at\": \"2025-02-14 00:20:52.330806 +0000 UTC\",\n            \"updated_at\": \"2025-02-14 00:20:52.330806 +0000 UTC\"\n        },\n        {\n            \"id\": 3,\n            \"total_amount\": \"0\",\n            \"description\": \"\",\n            \"status\": \"PENDING\",\n            \"items\": [\n                {\n                    \"id\": 3,\n                    \"product_id\": 9,\n                    \"quantity\": 1,\n                    \"price\": \"25000\"\n                }\n            ],\n            \"created_at\": \"2025-02-14 00:11:16.289451 +0000 UTC\",\n            \"updated_at\": \"2025-02-14 00:11:16.289451 +0000 UTC\"\n        },\n        {\n            \"id\": 2,\n            \"total_amount\": \"0\",\n            \"description\": \"\",\n            \"status\": \"PENDING\",\n            \"items\": [\n                {\n                    \"id\": 2,\n                    \"product_id\": 9,\n                    \"quantity\": 1,\n                    \"price\": \"0\"\n                }\n            ],\n            \"created_at\": \"2025-02-14 00:07:46.318048 +0000 UTC\",\n            \"updated_at\": \"2025-02-14 00:07:46.318048 +0000 UTC\"\n        },\n        {\n            \"id\": 6,\n            \"total_amount\": \"25000\",\n            \"description\": \"Belanja emak\",\n            \"status\": \"PENDING\",\n            \"items\": [\n                {\n                    \"id\": 6,\n                    \"product_id\": 9,\n                    \"quantity\": 1,\n                    \"price\": \"25000\"\n                }\n            ],\n            \"created_at\": \"2025-02-14 00:22:33.927971 +0000 UTC\",\n            \"updated_at\": \"2025-02-14 00:22:33.927971 +0000 UTC\"\n        },\n        {\n            \"id\": 7,\n            \"total_amount\": \"25000\",\n            \"description\": \"Belanja emak\",\n            \"status\": \"PENDING\",\n            \"items\": [\n                {\n                    \"id\": 7,\n                    \"product_id\": 9,\n                    \"quantity\": 1,\n                    \"price\": \"25000\"\n                }\n            ],\n            \"created_at\": \"2025-02-14 22:55:03.315763 +0000 UTC\",\n            \"updated_at\": \"2025-02-14 22:55:03.315763 +0000 UTC\"\n        },\n        {\n            \"id\": 8,\n            \"total_amount\": \"25000\",\n            \"description\": \"Belanja emak\",\n            \"status\": \"PENDING\",\n            \"items\": [\n                {\n                    \"id\": 8,\n                    \"product_id\": 9,\n                    \"quantity\": 1,\n                    \"price\": \"25000\"\n                }\n            ],\n            \"created_at\": \"2025-02-15 12:53:13.9898 +0000 UTC\",\n            \"updated_at\": \"2025-02-15 12:53:13.9898 +0000 UTC\"\n        },\n        {\n            \"id\": 9,\n            \"total_amount\": \"25000\",\n            \"description\": \"Belanja emak\",\n            \"status\": \"CANCELLED\",\n            \"items\": [\n                {\n                    \"id\": 9,\n                    \"product_id\": 9,\n                    \"quantity\": 1,\n                    \"price\": \"25000\"\n                }\n            ],\n            \"created_at\": \"2025-02-17 23:00:17.259698 +0000 UTC\",\n            \"updated_at\": \"2025-02-17 23:00:17.336002 +0000 UTC\"\n        },\n        {\n            \"id\": 10,\n            \"total_amount\": \"25000\",\n            \"description\": \"Belanja emak\",\n            \"status\": \"CANCELLED\",\n            \"items\": [\n                {\n                    \"id\": 10,\n                    \"product_id\": 9,\n                    \"quantity\": 1,\n                    \"price\": \"25000\"\n                }\n            ],\n            \"created_at\": \"2025-02-17 23:13:46.426794 +0000 UTC\",\n            \"updated_at\": \"2025-02-17 23:13:46.459094 +0000 UTC\"\n        },\n        {\n            \"id\": 1,\n            \"total_amount\": \"0\",\n            \"description\": \"\",\n            \"status\": \"PENDING\",\n            \"items\": [\n                {\n                    \"id\": 1,\n                    \"product_id\": 9,\n                    \"quantity\": 1,\n                    \"price\": \"0\"\n                }\n            ],\n            \"created_at\": \"2025-02-13 23:59:58.037145 +0000 UTC\",\n            \"updated_at\": \"2025-02-13 23:59:58.037145 +0000 UTC\"\n        }\n    ],\n    \"paging\": {\n        \"page\": 1,\n        \"size\": 10,\n        \"total_item\": 11,\n        \"total_page\": 2,\n        \"links\": {\n            \"self\": \"http://localhost:8000/?end-date=01-03-2025&limit=10&page=1&start-date=01-02-2025\",\n            \"first\": \"http://localhost:8000/?end-date=01-03-2025&limit=10&page=1&start-date=01-02-2025\",\n            \"prev\": \"http://localhost:8000/?end-date=01-03-2025&limit=10&page=1&start-date=01-02-2025\",\n            \"next\": \"http://localhost:8000/?end-date=01-03-2025&limit=10&page=2&start-date=01-02-2025\",\n            \"last\": \"http://localhost:8000/?end-date=01-03-2025&limit=10&page=2&start-date=01-02-2025\"\n        }\n    }\n}"
+								},
+								{
+									"name": "Bad request",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{GATEWAY_URL}}/orders",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"orders"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "10",
+													"disabled": true
+												},
+												{
+													"key": "page",
+													"value": "1",
+													"disabled": true
+												},
+												{
+													"key": "status",
+													"value": "",
+													"disabled": true
+												},
+												{
+													"key": "start-date",
+													"value": "01-02-2025",
+													"disabled": true
+												},
+												{
+													"key": "end-date",
+													"value": "01-03-2025",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 19 Feb 2025 07:25:08 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "159"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"input validation error\",\n    \"errors\": [\n        {\n            \"field\": \"start-date\",\n            \"message\": \"start-date is required\"\n        },\n        {\n            \"field\": \"end-date\",\n            \"message\": \"end-date is required\"\n        },\n        {\n            \"field\": \"limit\",\n            \"message\": \"limit must be greater than or equal to 1\"\n        },\n        {\n            \"field\": \"page\",\n            \"message\": \"page must be greater than or equal to 1\"\n        }\n    ]\n}"
+								}
+							]
+						},
+						{
+							"name": "Pay",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"request_id\": \"R0001\",\n    \"order_id\": 2\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{GATEWAY_URL}}/orders/pay",
+									"host": [
+										"{{GATEWAY_URL}}"
+									],
+									"path": [
+										"orders",
+										"pay"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"request_id\": \"R0001\",\n    \"order_id\": 2\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{GATEWAY_URL}}/orders/pay",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"orders",
+												"pay"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 19 Feb 2025 08:22:59 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "90"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"success\",\n    \"data\": {\n        \"order_id\": 2,\n        \"status\": \"SUCCESS\"\n    }\n}"
+								},
+								{
+									"name": "Not found",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"request_id\": \"R0001\",\n    \"order_id\": 100\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{GATEWAY_URL}}/orders/pay",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"orders",
+												"pay"
+											]
+										}
+									},
+									"status": "Not Found",
+									"code": 404,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 19 Feb 2025 09:17:23 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "57"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"order not found\"\n}"
+								},
+								{
+									"name": "Already paid",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"request_id\": \"R0001\",\n    \"order_id\": 1\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{GATEWAY_URL}}/orders/pay",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"orders",
+												"pay"
+											]
+										}
+									},
+									"status": "Conflict",
+									"code": 409,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 19 Feb 2025 09:17:29 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "60"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"order already paid\"\n}"
+								},
+								{
+									"name": "Already cancelled",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"request_id\": \"R0001\",\n    \"order_id\": 11\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{GATEWAY_URL}}/orders/pay",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"orders",
+												"pay"
+											]
+										}
+									},
+									"status": "Conflict",
+									"code": 409,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 19 Feb 2025 09:17:49 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "65"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"order already cancelled\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Cancel",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": [
+								{
+									"name": "Bad request",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{GATEWAY_URL}}/orders/cancel",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"orders",
+												"cancel"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 19 Feb 2025 09:18:23 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "117"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"input validation error\",\n    \"errors\": [\n        {\n            \"field\": \"request_id\",\n            \"message\": \"request_id is required\"\n        },\n        {\n            \"field\": \"order_id\",\n            \"message\": \"order_id is required\"\n        }\n    ]\n}"
+								},
+								{
+									"name": "Already paid",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"request_id\": \"R00001\",\n    \"order_id\": 1\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{GATEWAY_URL}}/orders/cancel",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"orders",
+												"cancel"
+											]
+										}
+									},
+									"status": "Conflict",
+									"code": 409,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 19 Feb 2025 09:19:04 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "60"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"order already paid\"\n}"
+								},
+								{
+									"name": "Already cancelled",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"request_id\": \"R00001\",\n    \"order_id\": 11\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{GATEWAY_URL}}/orders/cancel",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"orders",
+												"cancel"
+											]
+										}
+									},
+									"status": "Conflict",
+									"code": 409,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 19 Feb 2025 09:19:13 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "65"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"order already cancelled\"\n}"
+								},
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"request_id\": \"R00001\",\n    \"order_id\": 4\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{GATEWAY_URL}}/orders/cancel",
+											"host": [
+												"{{GATEWAY_URL}}"
+											],
+											"path": [
+												"orders",
+												"cancel"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Encoding",
+											"value": "gzip"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 19 Feb 2025 09:19:22 GMT"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept-Encoding"
+										},
+										{
+											"key": "Content-Length",
+											"value": "92"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"success\",\n    \"data\": {\n        \"order_id\": 4,\n        \"status\": \"CANCELLED\"\n    }\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{GATEWAY_URL}}/health",
+							"host": [
+								"{{GATEWAY_URL}}"
+							],
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{access_token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	]
+}

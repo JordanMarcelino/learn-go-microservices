@@ -18,10 +18,18 @@ services:
     volumes:
       - kafka-1_data:/bitnami/kafka
     healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "9092"]
+      test:
+        [
+          "CMD",
+          "kafka-cluster.sh",
+          "cluster-id",
+          "--bootstrap-server localhost:9092 || exit 1",
+        ]
       interval: 10s
       timeout: 5s
       retries: 10
+    networks:
+      - production
 
   kafka-2:
     <<: *kafka-common
@@ -45,3 +53,8 @@ volumes:
   kafka-1_data:
   kafka-2_data:
   kafka-3_data:
+
+networks:
+  production:
+    name: production
+    external: true

@@ -11,13 +11,22 @@ services:
       RABBITMQ_ERLANG_COOKIE: 40556c104edf7359de6a595c
     volumes:
       - rabbitmq-1_data:/var/lib/rabbitmq/mnesia
+    command: >
+      sh -c "
+      apk add --no-cache curl &&
+      curl -Lo plugins/rabbitmq_delayed_message_exchange.ez
+      https://github.com/rabbitmq/rabbitmq-delayed-message-exchange/releases/download/v4.0.2/rabbitmq_delayed_message_exchange-4.0.2.ez &&
+      rabbitmq-plugins enable rabbitmq_delayed_message_exchange &&
+      rabbitmq-server"
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
       interval: 10s
       timeout: 5s
       retries: 10
+    networks:
+      - production
 
-  rabbitmq-2:
+  rabbitmq-2: &rabbitmq-slave
     <<: *rabbitmq-common
     hostname: rabbitmq-2
     container_name: rabbitmq-2
@@ -26,7 +35,11 @@ services:
     volumes:
       - rabbitmq-2_data:/var/lib/rabbitmq/mnesia
     command: >
-      bash -c "
+      sh -c "
+      apk add --no-cache curl &&
+      curl -Lo plugins/rabbitmq_delayed_message_exchange.ez
+      https://github.com/rabbitmq/rabbitmq-delayed-message-exchange/releases/download/v4.0.2/rabbitmq_delayed_message_exchange-4.0.2.ez &&
+      rabbitmq-plugins enable rabbitmq_delayed_message_exchange &&
       rabbitmq-server -detached &&
       sleep 10 &&
       rabbitmqctl stop_app &&
@@ -39,25 +52,11 @@ services:
         condition: service_healthy
 
   rabbitmq-3:
-    <<: *rabbitmq-common
+    <<: *rabbitmq-slave
     hostname: rabbitmq-3
     container_name: rabbitmq-3
-    environment:
-      <<: *rabbitmq-env
     volumes:
       - rabbitmq-3_data:/var/lib/rabbitmq/mnesia
-    command: >
-      bash -c "
-      rabbitmq-server -detached &&
-      sleep 10 &&
-      rabbitmqctl stop_app &&
-      rabbitmqctl join_cluster rabbit@rabbitmq-1 &&
-      rabbitmqctl start_app &&
-      rabbitmqctl stop &&
-      exec rabbitmq-server"
-    depends_on:
-      rabbitmq-1:
-        condition: service_healthy
 
   haproxy-rabbitmq:
     image: "haproxy:latest"
@@ -74,8 +73,15 @@ services:
         condition: service_healthy
       rabbitmq-3:
         condition: service_healthy
+    networks:
+      - production
 
 volumes:
   rabbitmq-1_data:
   rabbitmq-2_data:
   rabbitmq-3_data:
+
+networks:
+  production:
+    name: production
+    external: true

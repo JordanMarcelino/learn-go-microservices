@@ -26,7 +26,9 @@ func NewCancelNotificationProducer(conn *amqp.Connection) mq.AMQPProducer {
 	}
 
 	if err := ch.ExchangeDeclare(exchange, "topic", true, false, false, false, nil); err != nil {
-		log.Logger.Fatalf("failed to declare an exchange: %s", err)
+		if amqpErr, ok := err.(*amqp.Error); ok && amqpErr.Code != amqp.PreconditionFailed {
+			log.Logger.Fatalf("failed to declare an exchange: %s", err)
+		}
 	}
 
 	return &CancelNotificationProducer{
