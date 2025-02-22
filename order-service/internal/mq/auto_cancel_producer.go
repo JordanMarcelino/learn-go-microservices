@@ -28,8 +28,10 @@ func NewAutoCancelProducer(conn *amqp.Connection) mq.AMQPProducer {
 	args := amqp.Table{
 		"x-delayed-type": "topic",
 	}
-	if err := ch.ExchangeDeclare(exchange, "topic", true, false, false, false, args); err != nil {
-		log.Logger.Fatalf("failed to declare an exchange: %s", err)
+	if err := ch.ExchangeDeclare(exchange, "x-delayed-message", true, false, false, false, args); err != nil {
+		if amqpErr, ok := err.(*amqp.Error); ok && amqpErr.Code != amqp.PreconditionFailed {
+			log.Logger.Fatalf("failed to declare an exchange: %s", err)
+		}
 	}
 
 	return &AutoCancelProducer{

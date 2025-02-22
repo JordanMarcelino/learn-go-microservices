@@ -1,7 +1,7 @@
 package constant
 
 const (
-	PaymentReminderExchange = "notifications"
+	PaymentReminderExchange = "payments"
 	PaymentReminderKey      = "send.payment.reminder"
 	PaymentReminderQueue    = "reminder"
 

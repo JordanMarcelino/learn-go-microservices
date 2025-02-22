@@ -19,14 +19,16 @@ type OrderSuccessProducer struct {
 }
 
 func NewOrderSuccessProducer(conn *amqp.Connection) mq.AMQPProducer {
-	exchange := constant.PaymentReminderExchange
+	exchange := constant.OrderSuccessExchange
 	ch, err := conn.Channel()
 	if err != nil {
 		log.Logger.Fatalf("failed to open a channel: %s", err)
 	}
 
 	if err := ch.ExchangeDeclare(exchange, "topic", true, false, false, false, nil); err != nil {
-		log.Logger.Fatalf("failed to declare an exchange: %s", err)
+		if amqpErr, ok := err.(*amqp.Error); ok && amqpErr.Code != amqp.PreconditionFailed {
+			log.Logger.Fatalf("failed to declare an exchange: %s", err)
+		}
 	}
 
 	return &OrderSuccessProducer{
