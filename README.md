@@ -1,4 +1,4 @@
-# 🚀 Go Microservices E-Commerce Platform
+# 🚀 Go Microservices Simple E-Commerce Platform
 
 Welcome to my journey of building a scalable microservices architecture using Golang! This project will implement core microservices patterns with modern technologies.
 
@@ -6,10 +6,40 @@ Welcome to my journey of building a scalable microservices architecture using Go
 [![Docker](https://img.shields.io/badge/Docker-24.0+-blue.svg)](https://www.docker.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+## ❓ How to Run
+
+1. Clone the repository
+
+```bash
+git clone https://github.com/JordanMarcelino/learn-go-microservices.git
+```
+
+2. Start the Docker Compose
+
+```bash
+make
+```
+
+3. Check the services
+
+```bash
+docker compose ps
+```
+
+4. Import the Postman collection
+
+5. Test the APIs
+
+6. Stop the services
+
+```bash
+make compose-down
+```
+
 ## 🌟 Key Features
 
 -   **Event-Driven Architecture** with Kafka & RabbitMQ
--   **Database Sharding** with PostgreSQL Cluster
+-   **Database Master-Slave Replica** with PostgreSQL Cluster
 -   **Observability** with OpenTelemetry & Grafana Stack
 -   **Production-Grade** Infrastructure Setup
 
