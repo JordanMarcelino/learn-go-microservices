@@ -1,5 +1,8 @@
 include ${CURDIR}/.env
 
+build:
+	@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-w -s" -tags="sonic avx" -v -o ${CURDIR}/bin/main ${CURDIR}/cmd/api/main.go
+
 test:
 	@go test -v -cover ${CURDIR}/...
 
