@@ -21,7 +21,7 @@ type mailerImpl struct{}
 
 func NewMailer() Mailer {
 	initOnce.Do(func() {
-		dialer = gomail.NewDialer(config.SMTP_CONFIG.Host, config.SMTP_CONFIG.Port, config.SMTP_CONFIG.Email, "")
+		dialer = gomail.NewDialer(config.SMTP_CONFIG.Host, config.SMTP_CONFIG.Port, "", "")
 	})
 
 	return &mailerImpl{}
