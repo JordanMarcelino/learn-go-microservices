@@ -192,3 +192,8 @@ volumes:
   pg-order-1_data:
   pg-order-2_data:
   pg-order-3_data:
+
+networks:
+  default:
+    name: production
+    external: true
