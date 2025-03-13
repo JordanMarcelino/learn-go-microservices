@@ -1,0 +1,72 @@
+services:
+  pg-auth-exporter:
+    image: "bitnami/postgres-exporter:latest"
+    container_name: "pg-auth-exporter"
+    environment:
+      DATA_SOURCE_NAME: "postgresql://pgpool-auth:postgres@postgres:5432/api_db?sslmode=disable"
+
+  pg-product-exporter:
+    image: "bitnami/postgres-exporter:latest"
+    container_name: "pg-product-exporter"
+    environment:
+      DATA_SOURCE_NAME: "postgresql://pgpool-product:postgres@postgres:5432/api_db?sslmode=disable"
+
+  pg-order-exporter:
+    image: "bitnami/postgres-exporter:latest"
+    container_name: "pg-order-exporter"
+    environment:
+      DATA_SOURCE_NAME: "postgresql://pgpool-order:postgres@postgres:5432/api_db?sslmode=disable"
+
+  cadvisor:
+    image: "gcr.io/cadvisor/cadvisor:latest"
+    container_name: "cadvisor"
+    volumes:
+      - "/:/rootfs"
+      - "/var/run:/var/run"
+      - "/sys:/sys"
+      - "/var/lib/docker/:/var/lib/docker"
+      - "/dev/disk/:/dev/disk"
+    privileged: true
+    devices:
+      - "/dev/kmsg"
+
+  prometheus:
+    image: "prom/prometheus:latest"
+    ports:
+      - 9090:9090
+    volumes:
+      - "./../infra/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml"
+    privileged: true
+    depends_on:
+      - cadvisor
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      DS_PROMETHEUS: prometheus
+      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
+      GF_SMTP_ENABLED: true
+      GF_SMTP_HOST: mailhog:1025
+      GF_SMTP_FROM_ADDRESS: no-reply@gomicroservices.com
+      GF_SMTP_FROM_NAME: Go Microservices
+      GF_SMTP_EHLO_IDENTITY: localhost
+      GF_SMTP_STARTTLS_POLICY: NoStartTLS
+    volumes:
+      - "grafana-data:/var/lib/grafana"
+      - "./../infra/grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yml"
+      - "./../infra/grafana/dashboard.json:/var/lib/grafana/dashboards/dashboard.json"
+      - "./../infra/grafana/default.yaml:/etc/grafana/provisioning/dashboards/default.yaml"
+    privileged: true
+
+volumes:
+  grafana_data:
+  prometheus_data:
+  alloy_data:
+  otel_data:
+
+networks:
+  production:
+    name: production
+    external: true
